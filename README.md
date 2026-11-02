@@ -108,6 +108,10 @@ Built with Svelte 5, TypeScript, Tailwind CSS v4, Skeleton UI v5, Vite, and Vite
 
 This repository was developed with substantial assistance from AI agents. The maintainer estimates that AI agents contributed to up to 80% of the implementation. This is an approximate estimate, not a measured share; project direction, review, and responsibility remain with the human maintainer.
 
+## License
+
+Calctainer is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
 ## Scope and assumptions
 
 Only workloads running inside hosted clusters are modelled. The application does not model management-cluster or hosted-control-plane resource consumption, nor does it attempt full Kubernetes scheduling semantics. Classic-versus-HCP comparison is not a one-to-one conversion of old worker VMs and is not a complete platform TCO. Instance pricing, platform overhead, utilization, classic-cluster baseline, and other defaults are planning assumptions; review them in **Assumptions** and replace sample values with values appropriate to your environment.

@@ -2,6 +2,7 @@
 
 ## 2026-11-02
 
+- Adopted the MIT License for Calctainer, declared it in package metadata, and documented the license in the README.
 - Changed the primary palette to Petrol (`#007194`), Ziegelstein (`#b22222`), and PANTONE 7405 (`#FFCC00`); red is now reserved for semantic error states. Resource-series shades remain legible across light and dark themes.
 - Added a README disclosure that AI agents contributed to an estimated up to 80% of the implementation, clarifying that the estimate is approximate and project responsibility remains with the human maintainer.
 
