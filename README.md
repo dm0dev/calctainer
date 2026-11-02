@@ -14,6 +14,8 @@ pnpm check      # Svelte and TypeScript checks
 pnpm build      # static bundle in dist/
 ```
 
+The HTML entry page is `src/index.html`. Vite serves `src` as its root, copies static assets from `public`, and writes the production site to `dist/index.html`. Run the commands above from the repository root.
+
 ## Accessibility testing
 
 Run pa11y or Lighthouse against a local dev or preview server to check WCAG 2.1 AA compliance:

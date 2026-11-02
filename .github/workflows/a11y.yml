@@ -2,7 +2,7 @@ name: Accessibility
 
 on:
   pull_request:
-    paths: ['src/**', 'public/**', 'index.html', 'package.json', 'pnpm-lock.yaml', '.pa11yci.json', 'vite.config.ts', '.github/workflows/a11y.yml']
+    paths: ['src/**', 'public/**', 'package.json', 'pnpm-lock.yaml', '.pa11yci.json', 'vite.config.ts', '.github/workflows/a11y.yml']
   workflow_dispatch:
 
 permissions:
