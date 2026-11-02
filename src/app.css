@@ -32,16 +32,16 @@
 
 :root {
 	/* Metric series are independent of brand and success/warning/error palettes. */
-	--res-cpu: #7850b0;
-	--res-mem: #a13983;
-	--res-storage: #217563;
-	--metric-comparison: var(--res-storage);
+	--res-cpu: #a13983;
+	--res-mem: #215075;
+	--res-storage: var(--color-surface-600);
+	--metric-comparison: light-dark(var(--color-success-500), var(--color-success-400));
 }
 .dark {
 	/* Lighter resource colours for dark mode to meet WCAG 2.0 AA contrast (4.5:1). */
-	--res-cpu: #bb9bea;
-	--res-mem: #ed9aca;
-	--res-storage: #78d7bc;
+	--res-cpu: #ed9aca;
+	--res-mem: #78d7bc;
+	--res-storage: var(--color-surface-400);
 }
 
 html,

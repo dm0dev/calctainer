@@ -420,9 +420,9 @@
 									{:else if h && !h.hpaFits}
 										<span class="badge preset-filled-warning-500 px-1.5 py-0" title={translate('HPA maximum cannot be reached', app.ui.language)}>{translate('peak', app.ui.language)} {h.replicas + h.extraWithAutoscale}/{h.maxReplicas}</span>
 									{:else if h}
-										<span class="text-success-700-300" title={translate('Additional replicas that fit on current nodes', app.ui.language)}>+{h.capped ? `${h.extraOnCurrent}+` : h.extraOnCurrent} {translate('spare', app.ui.language)}</span>
+										<span class="text-success-600-400" title={translate('Additional replicas that fit on current nodes', app.ui.language)}>+{h.capped ? `${h.extraOnCurrent}+` : h.extraOnCurrent} {translate('spare', app.ui.language)}</span>
 									{:else}
-										<span class="text-success-700-300">{translate('scheduled', app.ui.language)}</span>
+										<span class="text-success-600-400">{translate('scheduled', app.ui.language)}</span>
 									{/if}
 								</td>
 								<td>
@@ -522,7 +522,7 @@
 	{:else if hpaShort > 0}
 		<span class="badge preset-filled-warning-500 px-1.5 py-0 text-xs" title={tr('Workloads whose HPA maximum cannot be reached')}>{tr('{count} peak short', { count: hpaShort })}</span>
 	{:else}
-		<span class="text-xs text-success-700-300">✓ {tr('fits')}</span>
+		<span class="text-xs text-success-600-400">✓ {tr('fits')}</span>
 	{/if}
 {/snippet}
 

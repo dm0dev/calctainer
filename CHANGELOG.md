@@ -2,6 +2,14 @@
 
 ## 2026-11-02
 
+- Rebased all success shades on `#217563` for consistent green status text, badges, and shapes, preserving the independently edited memory colors.
+
+- Applied vibrant success green consistently to savings figures, healthy quota percentages, and positive statuses; memory resource metrics remain mint.
+
+- Made the success palette a more vibrant yellow-green, visually distinct from mint memory metrics while retaining contrasting light/dark status text and badges.
+
+- Remapped CPU metrics to berry, memory to mint, and storage to theme-aware gray. Merged worker count and capacity into one header box and top-aligned all six metric boxes consistently, including clickable quota, findings, and savings boxes.
+
 - Fixed pa11y findings across the app: restored a keyboard-focusable skip-to-content link, used correctly announced pressed buttons for cluster selection, named pool charts and the Assumptions fieldset, and corrected low-contrast labels in Scheduling, Savings, Findings, and Assumptions. Scatter axes now use readable HTML labels instead of tiny SVG text, workload fit status uses explicit words, and decorative Guided explanation arrows are hidden from assistive technology. Sample-scenario audits pass across seven views, three modes, and both themes; this is not a full conformance claim.
 
 - Separated metrics from status colors: CPU is purple, memory pink, and storage/comparison metrics mint, with accessible light/dark shades. Workload chart series use the same hue families. Savings estimates no longer imply a success/error status; actual alerts and quota violations retain semantic colors.

@@ -108,7 +108,7 @@ Red Hat operator presets are bundled, fixed snapshots of default resource values
 
 ## Stack and design
 
-Built with Svelte 5, TypeScript, Tailwind CSS v4, Skeleton UI v5, Vite, and Vitest. Red Hat Display is used for interface typography, with Red Hat Mono for numeric data; the brand palette uses Petrol (`#007194`), Ziegelstein (`#b22222`), PANTONE 7405 (`#FFCC00`), and neutral surfaces. Metrics use a separate purple (CPU), pink (memory), and mint (storage/comparisons) palette, with matching workload-chart shades and light/dark variants. Success, warning, and error colors are reserved for status, not ordinary data series or savings estimates. The calculation engine is in `src/lib/engine` and is kept separate from Svelte rendering. The interface uses a compact ledger-inspired design, responsive navigation, and light/dark themes.
+Built with Svelte 5, TypeScript, Tailwind CSS v4, Skeleton UI v5, Vite, and Vitest. Red Hat Display is used for interface typography, with Red Hat Mono for numeric data; the brand palette uses Petrol (`#007194`), Ziegelstein (`#b22222`), PANTONE 7405 (`#FFCC00`), and neutral surfaces. Metrics use berry (CPU), blue/mint (memory), and dark/light gray (storage), with light/dark variants; workload-chart series use purple, pink, and mint shades. Savings figures and healthy statuses use a success palette based on `#217563`, with explicit signs distinguishing savings from increases; warning and error colors indicate actual alerts. The calculation engine is in `src/lib/engine` and is kept separate from Svelte rendering. The interface uses a compact ledger-inspired design, responsive navigation, and light/dark themes.
 
 ## AI-assisted development
 

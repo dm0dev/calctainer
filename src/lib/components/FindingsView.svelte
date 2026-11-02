@@ -24,7 +24,7 @@
 		critical: { icon: AlertOctagon, cls: 'text-error-600-400', bar: 'bg-error-500', label: translate(guided ? 'Must fix' : 'Critical', app.ui.language) },
 		warning: { icon: AlertTriangle, cls: 'text-warning-700-300', bar: 'bg-warning-500', label: translate(guided ? 'Should check' : 'Warning', app.ui.language) },
 		info: { icon: Info, cls: 'text-secondary-600-400', bar: 'bg-secondary-500', label: translate(guided ? 'Good to know' : 'Info', app.ui.language) },
-		ok: { icon: CheckCircle2, cls: 'text-success-700-300', bar: 'bg-success-500', label: translate('OK', app.ui.language) }
+		ok: { icon: CheckCircle2, cls: 'text-success-600-400', bar: 'bg-success-500', label: translate('OK', app.ui.language) }
 	} as const);
 </script>
 

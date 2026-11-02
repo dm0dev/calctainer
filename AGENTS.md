@@ -78,7 +78,7 @@ Use the existing stack:
 
 Do not migrate to vanilla JavaScript or introduce another UI framework. Keep calculation/domain logic framework-independent TypeScript in `src/lib/engine`; Svelte components should render and dispatch changes rather than own calculation rules. Reuse the Red Hat Display and Red Hat Mono typography, Petrol (`#007194`), Ziegelstein (`#b22222`), PANTONE 7405 (`#FFCC00`), neutral surface tokens, resource-series colors, compact ledger-style inputs, surface cards, responsive navigation, and light/dark theme behavior. Reserve red error tokens for error states rather than primary brand styling.
 
-Metric series use independent `--res-cpu` (purple), `--res-mem` (pink), and `--res-storage` (mint) tokens in `app.css`; comparisons use `--metric-comparison`. Workload series in `colors.ts` use the same hue families. Keep theme-aware metric colors separate from success/warning/error statuses; retain explicit signs, units, labels, and status cues.
+Metric series use independent `--res-cpu` (berry), `--res-mem` (blue light / mint dark), and `--res-storage` (dark/light gray) tokens in `app.css`; savings figures use `--metric-comparison` (success green, shades 500/400). The success palette is based on `#217563` at shade 500, with contrasting light/dark variants for statuses and shapes. Workload series in `colors.ts` use purple, pink, and mint hue families. Keep resource-series colors independent of status palettes; retain explicit signs, units, labels, and status cues.
 
 ## Repository map
 

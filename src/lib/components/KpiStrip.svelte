@@ -36,16 +36,12 @@
 	</div>
 {/snippet}
 
-<div class="grid grid-cols-2 border-y border-surface-300-700 bg-surface-50-950/80 backdrop-blur sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
+<div class="grid grid-cols-2 border-y border-surface-300-700 bg-surface-50-950/80 backdrop-blur sm:grid-cols-3 xl:grid-cols-6 [&>*]:flex [&>*]:min-w-0 [&>*]:flex-col [&>*]:items-start [&>*]:justify-start [&>*]:text-left">
 	<div class="border-r border-surface-200-800 px-5 py-3.5">
 		<div class="eyebrow">{translate(guided ? 'Servers' : 'Worker nodes', app.ui.language)}</div>
 		<div class="num text-2xl font-bold">{fmt(t.nodes, 0)}</div>
+		{@render resources(t.vcpu, t.memGiB)}
 		<div class="text-xs text-surface-600-400">{translate('{count} pools', app.ui.language, { count: pools })} · {translate('{count} hosted clusters', app.ui.language, { count: app.scenario.clusters.length })}</div>
-	</div>
-	<div class="border-r border-surface-200-800 px-5 py-3.5">
-		<div class="eyebrow">{translate('Capacity', app.ui.language)}</div>
-		<div class="num text-2xl font-bold" style="color:var(--res-cpu)">{fmt(t.vcpu)}<span class="text-sm font-normal"> vCPU</span></div>
-		<div class="num text-xs" style="color:var(--res-mem)">{fmt(t.memGiB)} GiB {tr('memory')}</div>
 	</div>
 	<div class="border-r border-surface-200-800 px-5 py-3.5" title={tr('Baseline workload CPU/RAM requests divided by allocatable capacity on current worker nodes. This is declared app demand, not measured usage, a VM quota, or peak VM capacity.')}>
 		<div class="eyebrow">{translate(guided ? 'Reserved by apps' : 'Requested / allocatable', app.ui.language)}</div>
@@ -73,7 +69,7 @@
 		<div class="eyebrow">{translate(guided ? 'Check-up' : 'Findings', app.ui.language)}</div>
 		<div class="num flex items-baseline gap-3 text-2xl font-bold">
 			{#if crit + warn === 0}
-				<span class="text-success-700-300">OK</span>
+				<span class="text-success-600-400">OK</span>
 			{:else}
 				<span class="text-error-600-400">{crit}</span><span class="text-warning-700-300">{warn}</span>
 			{/if}

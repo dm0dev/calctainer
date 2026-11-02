@@ -27,7 +27,7 @@
 		return s;
 	});
 
-	const tone = (l: QuotaLine) => (l.pct == null ? 'text-surface-500' : l.pct > 1 ? 'text-error-600-400' : l.pct > 0.85 ? 'text-warning-700-300' : 'text-success-700-300');
+	const tone = (l: QuotaLine) => (l.pct == null ? 'text-surface-500' : l.pct > 1 ? 'text-error-600-400' : l.pct > 0.85 ? 'text-warning-700-300' : 'text-success-600-400');
 </script>
 
 {#snippet gauges(lines: QuotaLine[], quota: Quota, scope: string)}

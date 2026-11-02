@@ -110,7 +110,7 @@
 					<h3 class="text-lg font-bold">{pool}</h3>
 					<span class="num text-xs text-surface-600-400">{nodes.length} {tr('nodes')} · {nodes[0]?.typeId}</span>
 					{#if ft && phase === 'baseline'}
-						<span class="text-xs {ft.stranded ? 'text-error-600-400' : 'text-success-700-300'}">
+						<span class="text-xs {ft.stranded ? 'text-error-600-400' : 'text-success-600-400'}">
 							{tr(mode === 'guided' ? 'If the busiest server fails' : 'Node-failure test')}: {ft.displaced} {tr('pods displaced')}, {ft.stranded ? tr('{count} cannot be rescheduled').replace('{count}', String(ft.stranded)) : tr('all rescheduled')}
 						</span>
 					{/if}
@@ -225,7 +225,7 @@
 									<td class="text-right">{h.maxReplicas}</td>
 									<td class="text-right">+{h.extraOnCurrent}{h.capped && h.extraOnCurrent === h.extraWithAutoscale ? '+' : ''}</td>
 									<td class="text-right">+{h.extraWithAutoscale}{h.capped ? '+' : ''}</td>
-									<td class="text-right">{#if h.hpaFits}<span class="text-success-700-300">{tr('fits')}</span>{:else}<span class="text-error-600-400">{tr('does not fit')}</span>{/if}</td>
+									<td class="text-right">{#if h.hpaFits}<span class="text-success-600-400">{tr('fits')}</span>{:else}<span class="text-error-600-400">{tr('does not fit')}</span>{/if}</td>
 								</tr>
 							{/each}
 						</tbody>
