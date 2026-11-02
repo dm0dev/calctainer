@@ -31,16 +31,17 @@
 }
 
 :root {
-	/* Resource semantic colours — used consistently across every chart. */
-	--res-cpu: var(--color-primary-500);
-	--res-mem: var(--color-secondary-500);
-	--res-storage: var(--color-tertiary-700);
+	/* Metric series are independent of brand and success/warning/error palettes. */
+	--res-cpu: #7850b0;
+	--res-mem: #a13983;
+	--res-storage: #217563;
+	--metric-comparison: var(--res-storage);
 }
 .dark {
 	/* Lighter resource colours for dark mode to meet WCAG 2.0 AA contrast (4.5:1). */
-	--res-cpu: var(--color-primary-400);
-	--res-mem: var(--color-secondary-300);
-	--res-storage: var(--color-tertiary-300);
+	--res-cpu: #bb9bea;
+	--res-mem: #ed9aca;
+	--res-storage: #78d7bc;
 }
 
 html,
@@ -70,6 +71,23 @@ h4,
 	font-family: var(--font-mono);
 	font-variant-numeric: tabular-nums;
 	font-feature-settings: 'zero' 1;
+}
+
+.skip-link {
+	position: fixed;
+	top: 0.5rem;
+	left: 0.5rem;
+	z-index: 100;
+	transform: translateY(calc(-100% - 1rem));
+	padding: 0.75rem 1rem;
+	background: var(--color-surface-950-50);
+	color: var(--color-surface-50-950);
+	border-radius: var(--radius-base);
+}
+.skip-link:focus {
+	transform: translateY(0);
+	outline: 3px solid var(--color-primary-500);
+	outline-offset: 2px;
 }
 
 /* Ledger "sheet": a slightly lifted paper card with a hard offset shadow. */

@@ -2,7 +2,24 @@ export const LANGUAGES = ['en', 'de'] as const;
 export type Language = (typeof LANGUAGES)[number];
 
 const GERMAN: Record<string, string> = {
+	'Skip to main content': 'Zum Hauptinhalt springen',
+	'does not fit': 'passt nicht',
+	'month': 'Monat',
+	'Scenario quota': 'Szenarioquota',
+	'Baseline apps / current allocatable': 'App-Basisbedarf / aktuell zuweisbar',
+	'Peak VMs / infrastructure allowance': 'VM-Spitzenkapazität / Infrastrukturkontingent',
+	'The infrastructure allowance for all hosted-cluster worker VMs. Percentages compare full peak VM capacity with this allowance, including unused VM capacity. Automatic quotas are estimates to request, not granted capacity.':
+		'Das Infrastrukturkontingent für alle Worker-VMs der Hosted Cluster. Die Prozentwerte vergleichen die volle VM-Spitzenkapazität einschließlich ungenutzter VM-Kapazität mit diesem Kontingent. Automatische Quotas sind Schätzungen für die Beantragung, keine bewilligte Kapazität.',
+	'Baseline workload CPU/RAM requests divided by allocatable capacity on current worker nodes. This is declared app demand, not measured usage, a VM quota, or peak VM capacity.':
+		'CPU/RAM-Requests der Workloads bei Basislast geteilt durch die zuweisbare Kapazität der aktuellen Worker-Knoten. Dies ist deklarierter App-Bedarf, keine gemessene Nutzung, VM-Quota oder VM-Spitzenkapazität.',
 	'Automatically calculate CPU/RAM quota': 'CPU/RAM-Quota automatisch berechnen',
+	'Automatic quota headroom': 'Reserve für automatische Quotas',
+	'Adds this percentage to peak worker-VM CPU/RAM before rounding quotas up to whole cores and 16 GiB RAM steps. Does not add worker nodes.':
+		'Addiert diesen Prozentsatz zur Worker-VM-CPU/RAM bei Spitzenlast, bevor Quotas auf ganze Kerne und 16-GiB-RAM-Schritte aufgerundet werden. Fügt keine Worker-Knoten hinzu.',
+	'Peak VM capacity + {headroom}% headroom, rounded up to whole CPU cores and 16 GiB RAM steps. Scenario quotas sum the rounded cluster requirements. Change headroom in Assumptions; turn off automatic calculation to edit these fields.':
+		'VM-Spitzenkapazität + {headroom}% Reserve, aufgerundet auf ganze CPU-Kerne und 16-GiB-RAM-Schritte. Szenarioquotas summieren die gerundeten Clusterbedarfe. Ändern Sie die Reserve unter Annahmen; schalten Sie die automatische Berechnung aus, um diese Felder zu bearbeiten.',
+	'Automatic quota headroom must be a percentage between 0 and 100.':
+		'Die Reserve für automatische Quotas muss ein Prozentsatz zwischen 0 und 100 sein.',
 	'Calculated': 'Berechnet',
 	'Exceeded': 'Überschritten',
 	'Peak worker-VM capacity': 'Worker-VM-Kapazität bei Spitzenlast',

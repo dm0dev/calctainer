@@ -199,7 +199,7 @@
 					</header>
 
 					<div class="space-y-4 p-4">
-							<div class="flex flex-wrap gap-1" aria-label={tr('Node pictogram')}>
+							<div class="flex flex-wrap gap-1" role="img" aria-label={`${tr('Node pictogram')}: ${p.nodes} ${tr('nodes')}, ${tr('Max')} ${p.maxNodes}`}>
 							{#each Array(Math.min(p.maxNodes, 60)) as _, i (i)}
 								{@const isSpare = p.source === 'recommended' && i >= p.nodes - p.spare && i < p.nodes}
 								<span
@@ -217,6 +217,7 @@
 						<div class="grid grid-cols-[4rem_1fr_auto] items-center gap-x-3 gap-y-2 text-xs">
 							<span class="eyebrow">CPU</span>
 							<Meter
+								title={`CPU: ${fmt(u.daemon.cpu + u.used.cpu)} / ${fmt(u.alloc.cpu)}`}
 								max={u.alloc.cpu}
 								segments={[
 									{ value: u.daemon.cpu, color: 'var(--res-cpu)', hatch: true, label: tr('DaemonSets') },
@@ -227,6 +228,7 @@
 							<span class="num w-28 text-right">{fmt(u.daemon.cpu + u.used.cpu)} / {fmt(u.alloc.cpu)}</span>
 							<span class="eyebrow">{tr('Memory')}</span>
 							<Meter
+								title={`${tr('Memory')}: ${fmt(u.daemon.mem + u.used.mem)} / ${fmt(u.alloc.mem)}`}
 								max={u.alloc.mem}
 								segments={[
 									{ value: u.daemon.mem, color: 'var(--res-mem)', hatch: true, label: tr('DaemonSets') },

@@ -3,6 +3,7 @@
 	import { CATALOGS } from '../engine/catalog';
 	import { fmt, money } from '../engine/format';
 	import { allocatable, instanceCost, reserved } from '../engine/nodes';
+	import { DEFAULT_QUOTA_HEADROOM_PCT } from '../engine/quotas';
 	import { translate } from '../i18n';
 	import { app } from '../state.svelte';
 	import NumCell from './NumCell.svelte';
@@ -79,6 +80,7 @@
 	/>
 
 	<fieldset disabled={locked} class="space-y-8 {locked ? 'opacity-80' : ''}">
+		<legend class="sr-only">{tr('Assumptions')}</legend>
 		{#if locked}<p class="flex items-center gap-2 text-xs text-surface-600-400"><Lock class="size-3.5" /> {tr('read-only in guided mode')}</p>{/if}
 
 		<div class="grid gap-6 lg:grid-cols-3">
@@ -91,6 +93,10 @@
 					{#snippet labelSnippet()}<Term k="spare">{tr('Spare nodes per pool')}</Term>{/snippet}
 				</NumField>
 				<NumField label={tr('Minimum nodes per pool')} bind:value={app.scenario.assumptions.minNodesPerPool} min={1} />
+				<NumField label={tr('Automatic quota headroom')} value={a.quotaHeadroomPct ?? DEFAULT_QUOTA_HEADROOM_PCT}
+					onchange={(v) => (app.scenario.assumptions.quotaHeadroomPct = v ?? DEFAULT_QUOTA_HEADROOM_PCT)}
+					unit="%" min={0} max={100} step={1}
+					hint={tr('Adds this percentage to peak worker-VM CPU/RAM before rounding quotas up to whole cores and 16 GiB RAM steps. Does not add worker nodes.')} />
 				<div>
 					<div class="label-text mb-1 text-xs text-surface-700-300">{tr('Size pools for')}</div>
 					{@render choice('sizeFor', [
@@ -194,13 +200,13 @@
 					{#each app.scenario.catalog as t (t.id)}
 						{@const rv = reserved(t, a)}
 						{@const al = allocatable(t, a)}
-						<tr class="border-t border-surface-200-800 [&>td]:px-1 [&>td]:py-1 {a.allowedTypeIds.includes(t.id) ? '' : 'text-surface-500'}">
+						<tr class="border-t border-surface-200-800 [&>td]:px-1 [&>td]:py-1 {a.allowedTypeIds.includes(t.id) ? '' : 'text-surface-600-400'}">
  						<td class="text-center"><input type="checkbox" class="checkbox" checked={a.allowedTypeIds.includes(t.id)} onchange={() => toggleAllowed(t.id)} aria-label={tr('Allow {name}').replace('{name}', t.name)} /></td>
  						<td>{#if expert}<input class="cell-input text-left! font-semibold" bind:value={t.name} aria-label={tr('Type name')} />{:else}<span class="px-1.5 font-semibold">{t.name}</span>{/if}</td>
 							<td class="font-sans text-xs">{t.family}</td>
  						<td class="w-20">{#if expert}<NumCell bind:value={t.vcpu} min={1} title="vCPU" />{:else}<span class="block text-right">{t.vcpu}</span>{/if}</td>
  						<td class="w-24">{#if expert}<NumCell bind:value={t.memoryGiB} min={1} title={tr('Memory GiB')} />{:else}<span class="block text-right">{t.memoryGiB}</span>{/if}</td>
-							<td class="text-right text-surface-500">{fmt(rv.cpu, 2)}c · {fmt(rv.mem)}G</td>
+							<td class="text-right text-surface-600-400">{fmt(rv.cpu, 2)}c · {fmt(rv.mem)}G</td>
 							<td class="text-right">{fmt(al.cpu, 2)}c · {fmt(al.mem)}G</td>
 							<td class="w-28">
 								{#if !locked}

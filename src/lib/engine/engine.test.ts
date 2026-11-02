@@ -5,6 +5,7 @@ import { defaultAssumptions, newCluster, newPool, newWorkload, sampleScenario } 
 import { translateGuided } from './guided';
 import { csvToWorkloads, parseCpu, parseMem, scenarioError, workloadsToCsv } from './io';
 import { allocatable, reserved } from './nodes';
+import { automaticQuota, QUOTA_CPU_STEP, QUOTA_MEMORY_STEP } from './quotas';
 import { recommendPools } from './recommend';
 import { buildNodes, schedule } from './scheduler';
 import type { Scenario } from './types';
@@ -259,8 +260,8 @@ describe('infrastructure quotas', () => {
 		const c = analyzeScenario(s).clusters[0];
 		expect(c.pools[0].nodesPeak).toBe(8);
 		expect(c.quotaTotals.nodes).toBe(10);
-		expect(c.quota[0].quota).toBe(40);
-		expect(c.quota[1].quota).toBe(160);
+		expect(c.quota[0].quota).toBe(46);
+		expect(c.quota[1].quota).toBe(192);
 	});
 
 	it('calculates independent scenario and cluster caps and checks effective cluster allocations', () => {
@@ -280,8 +281,8 @@ describe('infrastructure quotas', () => {
 		expect(r.findings.some((f) => f.id === 'quota-scenario-cpu' && f.severity === 'critical')).toBe(true);
 		s.scenarioQuota.auto = true;
 		const auto = analyzeScenario(s);
-		expect(auto.quota[0].quota).toBe(40);
-		expect(auto.quota[1].quota).toBe(192);
+		expect(auto.quota[0].quota).toBe(47);
+		expect(auto.quota[1].quota).toBe(240);
 		expect(auto.findings.some((f) => f.id === 'quota-overcommit')).toBe(false);
 		expect(auto.findings.some((f) => f.category === 'quota')).toBe(false);
 		// A calculated scenario cap does not erase larger explicit cluster allocations.
@@ -295,11 +296,11 @@ describe('infrastructure quotas', () => {
 		s.scenarioQuota = { cpu: 5, memGiB: 6, auto: true };
 		const saved = JSON.stringify(s);
 		for (const mode of ['guided', 'standard', 'expert'] as const) {
-			expect(analyzeScenario(s, mode).clusters[0].quota[0].quota).toBe(24);
+			expect(analyzeScenario(s, mode).clusters[0].quota[0].quota).toBe(28);
 			expect(JSON.stringify(s)).toBe(saved);
 		}
 		s.clusters[0].nodePools[0].maxReplicas = 5;
-		expect(analyzeScenario(s).quota[0].quota).toBe(28);
+		expect(analyzeScenario(s).quota[0].quota).toBe(33);
 		s.clusters[0].quota.auto = false;
 		s.scenarioQuota.auto = false;
 		const manual = analyzeScenario(s);
@@ -323,7 +324,7 @@ describe('infrastructure quotas', () => {
 		const under = analyzeScenario(s);
 		expect(under.clusters[0].peak.unscheduled.length).toBeGreaterThan(0);
 		expect(under.findings.some((f) => f.id === `peak-${s.clusters[0].id}`)).toBe(true);
-		expect(under.clusters[0].quota[0].quota).toBe(24);
+		expect(under.clusters[0].quota[0].quota).toBe(28);
 		s.clusters[0].poolMode = 'auto';
 		const recommended = analyzeScenario(s);
 		s.clusters[0].quota = { cpu: 1, memGiB: 1 };
@@ -370,6 +371,58 @@ describe('infrastructure quotas', () => {
 		expect(scenarioError(invalidCap)).toContain('non-negative');
 		s.scenarioQuota.cpu = -1;
 		expect(() => analyzeScenario(s)).toThrow('non-negative');
+	});
+
+	it('adds configurable headroom, rounds upward to field steps, and defaults older files to 15%', () => {
+		const s = mixedPools();
+		s.clusters[0].quota.auto = true;
+		s.scenarioQuota.auto = true;
+		expect(s.assumptions.quotaHeadroomPct).toBe(15);
+		const normal = analyzeScenario(s);
+		expect(normal.clusters[0].quota.slice(0, 2).map((q) => q.quota)).toEqual([28, 160]);
+		delete s.assumptions.quotaHeadroomPct;
+		expect(scenarioError(s)).toBeNull();
+		expect(analyzeScenario(s).quota).toEqual(normal.quota);
+		s.assumptions.quotaHeadroomPct = 25;
+		const higher = analyzeScenario(s);
+		expect(higher.clusters[0].quota.slice(0, 2).map((q) => q.quota)).toEqual([30, 160]);
+		expect(higher.clusters[0].sim).toEqual(normal.clusters[0].sim);
+		expect(higher.clusters[0].pools).toEqual(normal.clusters[0].pools);
+		expect(higher.quota[0].quota).toBe(30);
+		s.assumptions.quotaHeadroomPct = 0;
+		expect(analyzeScenario(s).quota.slice(0, 2).map((q) => q.quota)).toEqual([24, 128]);
+		const back: Scenario = JSON.parse(JSON.stringify(s));
+		expect(back.assumptions.quotaHeadroomPct).toBe(0);
+		expect(scenarioError(back)).toBeNull();
+	});
+
+	it('never rounds quota requirements down or adds a spurious step at exact boundaries', () => {
+		expect(automaticQuota(100, QUOTA_CPU_STEP, 15)).toBe(115);
+		expect(automaticQuota(320, QUOTA_MEMORY_STEP, 15)).toBe(368);
+		expect(automaticQuota(0, QUOTA_MEMORY_STEP, 15)).toBe(0);
+		expect(automaticQuota(16.001, QUOTA_MEMORY_STEP, 0)).toBe(32);
+		for (const headroom of [0, 5, 15, 25, 100]) {
+			for (const peak of [0.1, 0.5, 1, 8, 24, 100, 128, 256, 320, 1000]) {
+				for (const step of [QUOTA_CPU_STEP, QUOTA_MEMORY_STEP]) {
+					const cap = automaticQuota(peak, step, headroom);
+					expect(cap % step).toBe(0);
+					expect(cap + 1e-10).toBeGreaterThanOrEqual(peak * (1 + headroom / 100));
+					expect(cap - step).toBeLessThan(peak * (1 + headroom / 100));
+				}
+			}
+		}
+	});
+
+	it('rejects invalid headroom on import and calculation instead of silently adjusting it', () => {
+		for (const invalid of [-1, 101, NaN, Infinity, null, '15']) {
+			const s = mixedPools();
+			expect(scenarioError({ ...s, assumptions: { ...s.assumptions, quotaHeadroomPct: invalid } })).toContain('between 0 and 100');
+		}
+		for (const invalid of [-1, 101, NaN, Infinity]) {
+			const s = mixedPools();
+			s.assumptions.quotaHeadroomPct = invalid;
+			expect(() => analyzeScenario(s)).toThrow('between 0 and 100');
+		}
 	});
 });
 

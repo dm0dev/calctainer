@@ -76,7 +76,7 @@
 							{#each ROLES as r (r.k)}
 								{@const v = s.classicBreakdown[r.k][metric]}
 								{#if v > 0}
-									<div class="num flex items-center justify-center overflow-hidden text-xs whitespace-nowrap text-white" style="flex:{v};background:{r.c}" title="{tr(r.l)}: {show(s.classicBreakdown[r.k], metric)}">
+									<div class="num flex items-center justify-center overflow-hidden text-xs whitespace-nowrap {r.k === 'worker' ? 'text-surface-50-950' : r.k === 'infra' ? 'text-surface-950' : 'text-white'}" style="flex:{v};background:{r.c}" title="{tr(r.l)}: {show(s.classicBreakdown[r.k], metric)}">
 										{tr(r.l)}
 									</div>
 								{/if}
@@ -85,7 +85,7 @@
 					</div>
 					<div>
 						<div class="mb-1 flex items-baseline justify-between">
-							<span class="font-display text-lg font-bold">{tr('Hosted control planes')} <span class="text-sm font-normal text-surface-500">({tr('workers only')})</span></span>
+							<span class="font-display text-lg font-bold">{tr('Hosted control planes')} <span class="text-sm font-normal text-surface-600-400">({tr('workers only')})</span></span>
 							<span class="num text-lg font-bold">{show(s.hcp, metric)}</span>
 						</div>
 						<div class="relative h-10">
@@ -99,7 +99,7 @@
 					{#each METRICS as m (m.v)}
 						<div>
 							<div class="eyebrow">{tr(m.l)}</div>
-							<div class="num text-2xl font-extrabold {s.saved[m.v] >= 0 ? 'text-success-700-300' : 'text-error-600-400'}">
+							<div class="num text-2xl font-extrabold" style="color:var(--metric-comparison)">
 								{s.saved[m.v] >= 0 ? '−' : '+'}{pctFmt(Math.abs(s.pct[m.v]))}
 							</div>
 							<div class="num text-xs text-surface-600-400">{show({ ...s.saved, [m.v]: Math.abs(s.saved[m.v]) } as Footprint, m.v)} {tr(s.saved[m.v] >= 0 ? 'saved' : 'more')}</div>

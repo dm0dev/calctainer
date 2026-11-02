@@ -1,7 +1,7 @@
-/** Deterministic, theme-friendly colours for workloads (golden-angle hue walk). */
+/** Deterministic workload series restricted to purple, pink, and mint, not status colours. */
 export function workloadColor(index: number): string {
-	const hue = (index * 137.508 + 25) % 360;
-	return `oklch(68% 0.13 ${hue.toFixed(1)})`;
+	const hue = [290, 330, 170][index % 3] + ((Math.floor(index / 3) % 3) - 1) * 10;
+	return `light-dark(oklch(45% 0.12 ${hue}), oklch(78% 0.1 ${hue}))`;
 }
 
 export function colorMap(ids: string[]): Map<string, string> {

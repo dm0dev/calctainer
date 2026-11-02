@@ -137,6 +137,8 @@ export interface Assumptions {
 	cpuLimitOvercommitWarn: number;
 	memLimitOvercommitWarn: number;
 	underUtilizedThreshold: number;
+	/** Extra quota allowance above peak worker-VM capacity, in percent. Missing means 15%. */
+	quotaHeadroomPct?: number;
 	pricePerVcpu: number;
 	pricePerGiB: number;
 	currency: string;

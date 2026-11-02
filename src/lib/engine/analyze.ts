@@ -1,5 +1,6 @@
 import { instanceCost, isDaemon, podFor, podsFor } from './nodes';
 import { DEFAULT_POOL, manualPools, minNodes, recommendPools, toPoolSpec } from './recommend';
+import { automaticQuota, DEFAULT_QUOTA_HEADROOM_PCT, QUOTA_CPU_STEP, QUOTA_MEMORY_STEP, quotaHeadroomPct } from './quotas';
 import { buildNodes, canPlace, cloneNodes, makeNode, pickNode, place, schedule, scheduleWithAutoscale, type PoolSpec } from './scheduler';
 import type {
 	Assumptions,
@@ -205,13 +206,15 @@ function totalsFor(sim: SimResult, pools: PoolResult[], workloads: Workload[], a
 	return t;
 }
 
-export function quotaLines(q: Quota, t: Totals): QuotaLine[] {
+export function quotaLines(q: Quota, t: Totals, headroomPct = DEFAULT_QUOTA_HEADROOM_PCT): QuotaLine[] {
 	if (q.auto !== undefined && typeof q.auto !== 'boolean') throw new Error('Automatic quota calculation must be true or false.');
 	const line = (resource: QuotaLine['resource'], quota: number | null | undefined, nodes: number, requests: number, limits: number): QuotaLine => {
 		if (quota != null && (!Number.isFinite(quota) || quota < 0))
 			throw new Error(`${resource} quota must be a non-negative number or empty.`);
 		const used = nodes;
-		const cap = q.auto && resource !== 'storage' ? used : quota;
+		const cap = q.auto && resource !== 'storage'
+			? automaticQuota(used, resource === 'cpu' ? QUOTA_CPU_STEP : QUOTA_MEMORY_STEP, headroomPct)
+			: quota;
 		const qq = cap != null && Number.isFinite(cap) && cap >= 0 ? cap : null;
 		return { resource, quota: qq, nodes, requests, limits, used, pct: qq == null ? null : qq === 0 ? (used > 0 ? Infinity : 0) : used / qq };
 	};
@@ -525,7 +528,7 @@ export function analyzeCluster(c: HostedCluster, allWorkloads: Workload[], a: As
 		unscheduled: peakPods(active)
 	}, pools, active, a);
 	quotaTotals.cost = pools.reduce((sum, p) => sum + p.maxNodes * instanceCost(p.type, a), 0);
-	const quota = quotaLines(c.quota, quotaTotals);
+	const quota = quotaLines(c.quota, quotaTotals, quotaHeadroomPct(a));
 	const findings = [
 		...clusterFindings(c, active, pools, sim, peak, failures, headroom, frag, rem, a),
 		...quotaFindings(quota, c.id, c.name, c.quota.auto)
@@ -589,7 +592,18 @@ export function analyzeScenario(s: Scenario, mode: Mode = 'expert'): ScenarioRes
 		for (const k of Object.keys(t) as (keyof Totals)[]) t[k] += c.quotaTotals[k];
 		return t;
 	}, { nodes: 0, vcpu: 0, memGiB: 0, allocCpu: 0, allocMem: 0, reqCpu: 0, reqMem: 0, limCpu: 0, limMem: 0, storageGiB: 0, pods: 0, cost: 0 });
-	const quota = quotaLines(s.scenarioQuota, quotaTotals);
+	const headroomPct = quotaHeadroomPct(s.assumptions);
+	const quota = quotaLines(s.scenarioQuota, quotaTotals, headroomPct);
+	if (s.scenarioQuota.auto) {
+		// Each cluster needs its own rounded allowance; the scenario must accommodate their sum.
+		for (const line of quota) {
+			if (line.resource === 'storage') continue;
+			const step = line.resource === 'cpu' ? QUOTA_CPU_STEP : QUOTA_MEMORY_STEP;
+			line.quota = clusters.reduce((sum, c) =>
+				sum + automaticQuota(line.resource === 'cpu' ? c.quotaTotals.vcpu : c.quotaTotals.memGiB, step, headroomPct), 0);
+			line.pct = line.quota > 0 ? line.used / line.quota : 0;
+		}
+	}
 	const clusterQuotaSum = clusters.reduce(
 		(acc, c) => ({ cpu: acc.cpu + (c.quota[0].quota ?? 0), mem: acc.mem + (c.quota[1].quota ?? 0), st: acc.st + (c.quota[2].quota ?? 0) }),
 		{ cpu: 0, mem: 0, st: 0 }

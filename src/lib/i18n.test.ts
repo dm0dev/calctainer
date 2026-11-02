@@ -22,6 +22,12 @@ describe('language preference', () => {
 		expect(translate('Next: {label} →', 'de', { label: 'Workloads' })).toBe('Weiter: Workloads →');
 	});
 
+	it('distinguishes infrastructure quota and baseline app request summaries', () => {
+		expect(translate('Scenario quota', 'de')).toBe('Szenarioquota');
+		expect(translate('Peak VMs / infrastructure allowance', 'de')).toBe('VM-Spitzenkapazität / Infrastrukturkontingent');
+		expect(translate('Baseline apps / current allocatable', 'de')).toBe('App-Basisbedarf / aktuell zuweisbar');
+	});
+
 	it('translates generated findings and guided explanations with values intact', () => {
 		expect(translate('Pool "workers" is 80% allocated (target 70%)', 'de')).toBe('Pool „workers“ ist zu 80% belegt (Ziel 70%)');
 		expect(translate('Each copy reserves 0.5 CPU core(s) (request) and may briefly use up to 2 (limit).', 'de')).toBe(

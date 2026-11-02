@@ -1,6 +1,7 @@
 import { CATALOGS } from './catalog';
 import { applyGuided } from './guided';
 import { DEFAULT_NAMESPACE, uniqueName } from './namespaces';
+import { DEFAULT_QUOTA_HEADROOM_PCT } from './quotas';
 import type { Assumptions, ClassicBaseline, GuidedProfile, HostedCluster, NodePool, Scenario, Workload, WorkloadKind } from './types';
 
 let counter = 0;
@@ -26,6 +27,7 @@ export const defaultAssumptions = (typeIds: string[]): Assumptions => ({
 	cpuLimitOvercommitWarn: 2,
 	memLimitOvercommitWarn: 1,
 	underUtilizedThreshold: 0.4,
+	quotaHeadroomPct: DEFAULT_QUOTA_HEADROOM_PCT,
 	pricePerVcpu: 22,
 	pricePerGiB: 3,
 	currency: '💎',

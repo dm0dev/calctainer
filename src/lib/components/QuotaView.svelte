@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fmt, pctFmt } from '../engine/format';
+	import { DEFAULT_QUOTA_HEADROOM_PCT, QUOTA_CPU_STEP, QUOTA_MEMORY_STEP } from '../engine/quotas';
 	import type { Quota, QuotaLine } from '../engine/types';
 	import { translate } from '../i18n';
 	import { app, plan } from '../state.svelte';
@@ -11,6 +12,7 @@
 	const mode = $derived(app.ui.mode);
 	const tr = (source: string) => translate(source, app.ui.language);
 	const r = $derived(plan.result);
+	const headroomPct = $derived(app.scenario.assumptions.quotaHeadroomPct ?? DEFAULT_QUOTA_HEADROOM_PCT);
 
 	const LABEL = { cpu: 'CPU', mem: 'Memory', storage: 'Storage (PVC)' } as const;
 	const UNIT = { cpu: 'cores', mem: 'GiB', storage: 'GiB' } as const;
@@ -38,13 +40,14 @@
 		</label>
 		{#if quota.auto}
 			<p class="text-xs text-surface-600-400">{tr('Calculated quota is a planning requirement, not a granted infrastructure allowance. Manual values are retained when automatic calculation is turned off.')}</p>
+			<p class="text-xs text-surface-600-400">{translate('Peak VM capacity + {headroom}% headroom, rounded up to whole CPU cores and 16 GiB RAM steps. Scenario quotas sum the rounded cluster requirements. Change headroom in Assumptions; turn off automatic calculation to edit these fields.', app.ui.language, { headroom: headroomPct })}</p>
 		{/if}
 		{#each lines as l (l.resource)}
 			<div class="grid grid-cols-[7rem_1fr] items-start gap-3">
 				<div>
 					<div class="eyebrow" style="color:{COLOR[l.resource]}">{tr(LABEL[l.resource])}</div>
-					<div class="num text-xl font-bold {quota.auto && l.resource !== 'storage' ? 'text-primary-600-400' : tone(l)}">
-						{quota.auto && l.resource !== 'storage' ? tr('Calculated') : l.pct == null ? '—' : !Number.isFinite(l.pct) ? tr('Exceeded') : pctFmt(l.pct)}
+					<div class="num text-xl font-bold {tone(l)}">
+						{l.pct == null ? '—' : !Number.isFinite(l.pct) ? tr('Exceeded') : pctFmt(l.pct)}
 					</div>
 				</div>
 				<div class="space-y-1.5">
@@ -62,10 +65,10 @@
 			</div>
 		{/each}
 		<div class="grid grid-cols-3 gap-2 border-t border-dashed border-surface-300-700 pt-3">
-			{#if !quota.auto}
-				<NumField label={tr('CPU quota')} bind:value={quota.cpu} unit="cores" nullable placeholder={tr('none')} />
-				<NumField label={tr('Memory quota')} bind:value={quota.memGiB} unit="GiB" nullable placeholder={tr('none')} step={16} />
-			{/if}
+			<NumField label={tr('CPU quota')} value={quota.auto ? lines[0].quota : quota.cpu} readonly={quota.auto ?? false}
+				onchange={(v) => (quota.cpu = v)} unit="cores" nullable placeholder={tr('none')} step={QUOTA_CPU_STEP} />
+			<NumField label={tr('Memory quota')} value={quota.auto ? lines[1].quota : quota.memGiB} readonly={quota.auto ?? false}
+				onchange={(v) => (quota.memGiB = v)} unit="GiB" nullable placeholder={tr('none')} step={QUOTA_MEMORY_STEP} />
 			<NumField label={tr('Storage quota (PVC)')} bind:value={quota.storageGiB} unit="GiB" nullable placeholder={tr('none')} step={100} />
 		</div>
 	</div>
@@ -81,6 +84,10 @@
 
 	<div class="sheet p-4">
 		<div class="eyebrow mb-2"><Term k="quota">{tr('Quota')}</Term> · {tr('Peak worker-VM capacity')}</div>
+		<div class="mb-3 grid gap-3 border-b border-dashed border-surface-300-700 pb-3 md:grid-cols-2">
+			<p class="text-sm text-surface-600-400"><strong class="text-surface-950-50">{tr('Scenario quota')}:</strong> {tr('The infrastructure allowance for all hosted-cluster worker VMs. Percentages compare full peak VM capacity with this allowance, including unused VM capacity. Automatic quotas are estimates to request, not granted capacity.')}</p>
+			<p class="text-sm text-surface-600-400"><strong class="text-surface-950-50">{tr('Reserved by apps')}:</strong> {tr('Baseline workload CPU/RAM requests divided by allocatable capacity on current worker nodes. This is declared app demand, not measured usage, a VM quota, or peak VM capacity.')}</p>
+		</div>
 		<p class="text-sm text-surface-600-400">{tr('CPU/RAM = sum of each pool’s VM count × full instance capacity. Recommended pools use peak demand plus spare nodes; custom autoscaling pools use their maximum, fixed pools their configured count. This is potential peak capacity, not the current order or workload requests/limits.')}</p>
 		<p class="mt-2 text-xs text-surface-600-400">{tr('Storage is separate: peak PVC requests, including DaemonSets at the pool maximum. VM disks are not modelled. Automatic calculation only sets CPU/RAM quotas; scheduling shortages remain visible in Findings.')}</p>
 	</div>

@@ -1,5 +1,6 @@
 import { uid, newCluster, newWorkload } from './defaults';
 import { DEFAULT_NAMESPACE, namespaceError, namespaceOf } from './namespaces';
+import { quotaHeadroomError } from './quotas';
 import type { AntiAffinity, Scenario, Workload, WorkloadKind } from './types';
 
 export const CSV_COLUMNS = [
@@ -178,6 +179,8 @@ export function scenarioError(x: unknown): string | null {
 	const s = x as Scenario;
 	if (!s || s.version !== 1 || !Array.isArray(s.clusters) || !Array.isArray(s.workloads) || !Array.isArray(s.catalog) || !s.assumptions)
 		return 'Not a Calctainer scenario (version 1).';
+	const headroomError = quotaHeadroomError(s.assumptions.quotaHeadroomPct);
+	if (headroomError) return headroomError;
 	for (const [scope, quota] of [
 		['Scenario', s.scenarioQuota],
 		...s.clusters.map((c) => [c?.name ?? '?', c?.quota] as const)

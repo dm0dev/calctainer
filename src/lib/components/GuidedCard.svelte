@@ -155,7 +155,7 @@
 		{#if tr}
 			<ul class="space-y-1.5 text-xs leading-snug text-surface-800-200">
 				{#each tr.explain as line, i (i)}
-					<li class="flex gap-2"><span class="num text-primary-600-400">→</span><span>{t(line)}</span></li>
+					<li class="flex gap-2"><span class="num text-surface-600-400" aria-hidden="true">→</span><span>{t(line)}</span></li>
 				{/each}
 			</ul>
 		{/if}

@@ -1,3 +1,4 @@
+import { untrack } from 'svelte';
 import { analyzeScenario } from './engine/analyze';
 import { emptyScenario, sampleScenario } from './engine/defaults';
 import { validateScenario } from './engine/io';
@@ -67,7 +68,7 @@ export function recompute(mode: Mode = app.ui.mode): void {
 		last = { result: analyzeScenario($state.snapshot(app.scenario) as Scenario, mode), error: null };
 	} catch (e) {
 		console.error(e);
-		last = { result: last.result, error: e instanceof Error ? e.message : String(e) };
+		last = { result: untrack(() => last.result), error: e instanceof Error ? e.message : String(e) };
 	}
 }
 

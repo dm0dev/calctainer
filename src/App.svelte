@@ -61,6 +61,7 @@
 </svelte:head>
 
 <div class="flex min-h-screen flex-col">
+	<a href="#main-content" class="skip-link" onclick={() => document.getElementById('main-content')?.focus()}>{translate('Skip to main content', app.ui.language)}</a>
 	<header class="sticky top-0 z-40 bg-surface-50-950/90 backdrop-blur" bind:clientHeight={headerH}>
 		<div class="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 md:px-8">
 			<div class="flex items-center gap-3">
@@ -148,7 +149,7 @@
 			</div>
 		</nav>
 
-		<main class="min-w-0 flex-1 px-4 py-8 md:px-10">
+		<main id="main-content" tabindex="-1" class="min-w-0 flex-1 px-4 py-8 md:px-10">
 			{#if plan.error}
 				<div class="mb-4 rounded-base preset-tonal-error p-3 text-sm">{translate('Calculation error: {message}. Showing last valid result.', app.ui.language, { message: plan.error })}</div>
 			{/if}

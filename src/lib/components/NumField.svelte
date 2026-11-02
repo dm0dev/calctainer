@@ -15,6 +15,7 @@
 		hint = '',
 		labelSnippet,
 		pct = false,
+		readonly = false,
 		onchange
 	}: {
 		label?: string;
@@ -29,6 +30,7 @@
 		labelSnippet?: Snippet;
 		/** Display a 0..1 fraction as percent. */
 		pct?: boolean;
+		readonly?: boolean;
 		onchange?: (v: number | null) => void;
 	} = $props();
 
@@ -39,6 +41,7 @@
 	const localizedUnit = $derived(unit ? translate(unit, app.ui.language) : '');
 
 	function onInput(e: Event) {
+		if (readonly) return;
 		const raw = (e.currentTarget as HTMLInputElement).value;
 		if (raw === '') {
 			if (nullable) {
@@ -61,7 +64,7 @@
 		</span>
 	{/if}
 	<div class="field-group {unit || pct ? 'grid-cols-[1fr_auto]' : 'grid-cols-1'}">
-		<input class="input field-sm num text-right" type="number" {step} {min} {max} value={shown} placeholder={localizedPlaceholder} oninput={onInput} />
+		<input class="input field-sm num text-right" type="number" {step} {min} {max} {readonly} value={shown} placeholder={localizedPlaceholder} oninput={onInput} />
 		{#if unit || pct}<span class="label preset-tonal num w-auto! text-xs">{pct ? '%' : localizedUnit}</span>{/if}
 	</div>
 	{#if hint}<span class="mt-1 block text-xs leading-snug text-surface-600-400">{localizedHint}</span>{/if}

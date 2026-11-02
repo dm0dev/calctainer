@@ -76,7 +76,7 @@
 							<div class="min-w-0 flex-1">
 								<div class="flex flex-wrap items-baseline gap-x-2">
  								<h4 class="font-display font-bold">{translate(f.title, app.ui.language)}</h4>
-									{#if f.clusterId}<span class="num text-xs text-surface-500">{clusterName.get(f.clusterId)}</span>{/if}
+									{#if f.clusterId}<span class="num text-xs text-surface-600-400">{clusterName.get(f.clusterId)}</span>{/if}
 								</div>
 								<p class="text-xs text-surface-800-200">{translate(guided && f.plain ? f.plain : f.detail, app.ui.language)}</p>
 								{#if f.action}

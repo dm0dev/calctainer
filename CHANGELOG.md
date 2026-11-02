@@ -2,6 +2,16 @@
 
 ## 2026-11-02
 
+- Fixed pa11y findings across the app: restored a keyboard-focusable skip-to-content link, used correctly announced pressed buttons for cluster selection, named pool charts and the Assumptions fieldset, and corrected low-contrast labels in Scheduling, Savings, Findings, and Assumptions. Scatter axes now use readable HTML labels instead of tiny SVG text, workload fit status uses explicit words, and decorative Guided explanation arrows are hidden from assistive technology. Sample-scenario audits pass across seven views, three modes, and both themes; this is not a full conformance claim.
+
+- Separated metrics from status colors: CPU is purple, memory pink, and storage/comparison metrics mint, with accessible light/dark shades. Workload chart series use the same hue families. Savings estimates no longer imply a success/error status; actual alerts and quota violations retain semantic colors.
+
+- Standardized header resource metrics: matching CPU/memory labels, resource-series colors, percentage layouts, vCPU/GiB units, and PVC storage formatting across capacity, app requests, and scenario quota. Quota exceedances retain error coloring; savings units are localized.
+
+- Restored quota percentages in automatic mode and added scenario CPU/RAM quota totals and utilization, plus the separate PVC quota, to the top summary. Clarified that infrastructure quota utilization measures peak full VM capacity against the allowance, while "Reserved by apps" measures baseline requests against current allocatable worker capacity.
+
+- Kept CPU/RAM quota inputs visible in automatic mode, filled read-only with calculated allowances. Added an Assumptions setting for automatic quota headroom (15% by default), with upward rounding to whole CPU cores and 16 GiB RAM steps. Scenario allowances sum rounded cluster requirements; manual caps remain available when automation is switched off. Older scenarios default to 15% headroom without changing their worker plans. Invalid assumptions now keep the last valid result without triggering a reactive update loop, and calculation resumes when corrected.
+
 - Added automatic CPU/RAM quota toggles per hosted cluster and for the scenario, retaining manual caps when disabled. Infrastructure quota checks now use full worker-VM capacity across every pool at its peak/maximum count, including recommended spare nodes, rather than baseline capacity or workload requests/limits. Older scenarios remain loadable, but their legacy quota-basis selection is ignored. Zero quotas are enforced. The quota view explains pool contributions and the difference between calculated requirements and granted allowances; PVC storage stays separate and checks peak demand, not VM disks.
 
 - Moved the HTML entry page into `src` and updated Vite and accessibility CI paths; development URLs, public assets, and the `dist` deployment output stay unchanged.

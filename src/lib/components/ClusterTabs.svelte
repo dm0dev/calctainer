@@ -17,21 +17,19 @@
 	const active = $derived(app.ui.clusterId ?? app.scenario.clusters[0]?.id);
 </script>
 
-	<div class="flex flex-wrap items-center gap-1.5" role="tablist" aria-label={translate('Hosted clusters', app.ui.language)}>
+<div class="flex flex-wrap items-center gap-1.5" role="group" aria-label={translate('Hosted clusters', app.ui.language)}>
 	<span class="eyebrow mr-1">{translate('Hosted cluster', app.ui.language)}</span>
 	{#if showAll}
 		<button
 			class="chip {active === '__all__' ? 'preset-filled-surface-950-50' : 'preset-outlined-surface-300-700'}"
-			role="tab"
-			aria-selected={active === '__all__'}
+			aria-pressed={active === '__all__'}
 			onclick={() => (app.ui.clusterId = '__all__')}>{translate('All', app.ui.language)}</button
 		>
 	{/if}
 	{#each app.scenario.clusters as c (c.id)}
 		<button
 			class="chip num {active === c.id ? 'preset-filled-surface-950-50' : 'preset-outlined-surface-300-700'}"
-			role="tab"
-			aria-selected={active === c.id}
+			aria-pressed={active === c.id}
 			onclick={() => (app.ui.clusterId = c.id)}
 		>
 			{c.name}

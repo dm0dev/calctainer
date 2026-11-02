@@ -124,7 +124,7 @@
 						>
 							<div class="num mb-1.5 flex items-center justify-between text-xs">
 								<span class="truncate font-semibold" title={n.id}>{n.id.split('/').pop()}</span>
-								<span class="text-surface-500">{n.pods.length + n.daemonPods.length}/{n.maxPods}</span>
+								<span class="text-surface-600-400">{n.pods.length + n.daemonPods.length}/{n.maxPods}</span>
 							</div>
 							<div class="space-y-1">
 								<Meter height="h-2.5" max={n.allocatable.cpu} segments={segs(n, 'cpu')} markers={[{ value: n.allocatable.cpu * a.targetUtilization, label: tr('target') }]} title="CPU" />
@@ -144,7 +144,14 @@
 		<div class="grid gap-6 lg:grid-cols-[auto_1fr]">
 			<div class="sheet p-4">
 				<div class="eyebrow mb-2">{tr('CPU vs memory per node')}</div>
-				<svg viewBox="0 0 {S} {S}" class="w-[240px]" role="img" aria-label={tr('Scatter of CPU versus memory utilisation per node')}>
+				<div class="mb-1 text-xs" style="color:var(--res-mem)">{tr('Memory requested')} ↑</div>
+				<div class="flex">
+					<div class="num relative w-9 shrink-0 text-right text-xs text-surface-600-400">
+						{#each [0, 0.5, 1] as t (t)}
+							<span class="absolute right-1 -translate-y-1/2" style:top={`${sy(t) / S * 240}px`}>{t * 100}%</span>
+						{/each}
+					</div>
+				<svg viewBox="0 0 {S} {S}" class="w-[240px] bg-surface-50-950" role="img" aria-label={tr('Scatter of CPU versus memory utilisation per node')}>
 					<rect x={sx(0)} y={sy(1)} width={sx(1) - sx(0)} height={sy(0) - sy(1)} fill="none" stroke="currentColor" stroke-opacity="0.25" />
 					<line x1={sx(0)} y1={sy(0)} x2={sx(1)} y2={sy(1)} stroke="currentColor" stroke-opacity="0.35" stroke-dasharray="3 3" />
 					<rect
@@ -155,17 +162,18 @@
 						fill="var(--color-success-500)"
 						fill-opacity="0.07"
 					/>
-					{#each [0, 0.5, 1] as t (t)}
-						<text x={sx(t)} y={S - 10} font-size="8" text-anchor="middle" class="num" fill="currentColor" opacity="0.6">{t * 100}%</text>
-						<text x={P - 4} y={sy(t) + 3} font-size="8" text-anchor="end" class="num" fill="currentColor" opacity="0.6">{t * 100}%</text>
-					{/each}
-					<text x={S / 2 + 10} y={S - 1} font-size="8" text-anchor="middle" fill="var(--res-cpu)">{tr('CPU requested')} →</text>
-					<text x="6" y={S / 2} font-size="8" text-anchor="middle" fill="var(--res-mem)" transform="rotate(-90 6 {S / 2})">{tr('Memory requested')} →</text>
 					{#each sim.nodes as n (n.id)}
 						{@const u = nodeUtil(n)}
  					<circle cx={sx(u.cpu)} cy={sy(u.mem)} r="4" fill={n.scaled ? 'var(--color-primary-500)' : 'currentColor'} fill-opacity="0.55"><title>{n.id}: CPU {pctFmt(u.cpu)}, {tr('Memory')} {pctFmt(u.mem)}</title></circle>
 					{/each}
 				</svg>
+				</div>
+				<div class="num relative ml-9 h-5 w-[240px] text-xs text-surface-600-400">
+					{#each [0, 0.5, 1] as t (t)}
+						<span class="absolute -translate-x-1/2" style:left={`${sx(t) / S * 240}px`}>{t * 100}%</span>
+					{/each}
+				</div>
+				<div class="ml-9 text-center text-xs" style="color:var(--res-cpu)">{tr('CPU requested')} →</div>
 				<p class="mt-1 max-w-[240px] text-xs text-surface-600-400">
 					{tr('Dots far from the diagonal mean one resource fills up while the other is')} <Term k="stranded">{tr('stranded')}</Term>.
 				</p>
@@ -181,7 +189,7 @@
   						<div class="text-xs text-surface-600-400">{tr('fragmentation index')}</div>
 							</div>
 							<div>
-								<div class="num text-2xl font-bold">{fr.refSlots}<span class="text-sm text-surface-500">/{fr.idealSlots}</span></div>
+								<div class="num text-2xl font-bold">{fr.refSlots}<span class="text-sm text-surface-600-400">/{fr.idealSlots}</span></div>
  							<div class="text-xs text-surface-600-400">{tr('typical pods ({cpu}c/{memory}G) that still fit vs. if free space were pooled').replace('{cpu}', fmt(fr.refPod.cpu, 2)).replace('{memory}', fmt(fr.refPod.mem))}</div>
 							</div>
 							<div>
@@ -217,7 +225,7 @@
 									<td class="text-right">{h.maxReplicas}</td>
 									<td class="text-right">+{h.extraOnCurrent}{h.capped && h.extraOnCurrent === h.extraWithAutoscale ? '+' : ''}</td>
 									<td class="text-right">+{h.extraWithAutoscale}{h.capped ? '+' : ''}</td>
-									<td class="text-right">{#if h.hpaFits}<span class="text-success-700-300">✓</span>{:else}<span class="text-error-600-400">✗</span>{/if}</td>
+									<td class="text-right">{#if h.hpaFits}<span class="text-success-700-300">{tr('fits')}</span>{:else}<span class="text-error-600-400">{tr('does not fit')}</span>{/if}</td>
 								</tr>
 							{/each}
 						</tbody>
