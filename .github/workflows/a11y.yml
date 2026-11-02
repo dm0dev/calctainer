@@ -1,0 +1,58 @@
+name: Accessibility
+
+on:
+  pull_request:
+    paths: ['src/**', 'public/**', 'index.html', 'package.json', 'pnpm-lock.yaml', '.pa11yci.json', 'vite.config.ts', '.github/workflows/a11y.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a11y-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  a11y:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/puppeteer
+          key: puppeteer-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Serve production build on :5173
+        run: |
+          pnpm exec vite preview --port 5173 --strictPort &
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:5173 >/dev/null && exit 0
+            sleep 1
+          done
+          echo "Preview server did not start" >&2
+          exit 1
+      - name: pa11y-ci (WCAG 2.1 AA, axe + htmlcs)
+        run: pnpm a11y:ci:all
+      - name: Lighthouse accessibility
+        run: pnpm lighthouse:ci
+      - name: Enforce Lighthouse accessibility score
+        run: |
+          node -e "
+          const r=require('./lighthouse-report.json');
+          const s=r.categories.accessibility.score*100;
+          console.log('Lighthouse accessibility score:',s);
+          if(s<95){console.error('Score below 95');process.exit(1)}"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: lighthouse-report
+          path: lighthouse-report.json
+          if-no-files-found: ignore
+          retention-days: 7

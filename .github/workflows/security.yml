@@ -1,0 +1,38 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+    paths: ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml']
+  pull_request:
+    paths: ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml']
+  schedule:
+    - cron: '0 5 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      # Audit reads the lockfile; no dependency install needed.
+      - name: Audit dependencies (high+)
+        run: pnpm audit --audit-level=high
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high

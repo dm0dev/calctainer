@@ -1,0 +1,19 @@
+/* Complete Tailwind CSS v4 + Skeleton v5 Configuration */
+@import 'tailwindcss';
+
+/* 1. Register Preset Themes */
+@import '@skeletonlabs/skeleton/themes/cerberus';
+@import '@skeletonlabs/skeleton/themes/mona';
+@import '@skeletonlabs/skeleton/themes/vox';
+@import '@skeletonlabs/skeleton/themes/dracula';
+@import '@skeletonlabs/skeleton/themes/rosepine';
+
+/* 2. Optional: Register Custom Theme */
+/* @import './my-custom-theme.css'; */
+
+/* 3. Optional: Global Theme Overrides */
+[data-theme='cerberus'] {
+  /* Override specific token values if needed */
+  --radius-base: 0.375rem;
+  --radius-container: 0.75rem;
+}

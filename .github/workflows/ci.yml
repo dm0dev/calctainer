@@ -1,0 +1,55 @@
+name: CI & Deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', '!a11y.md', '.github/workflows/a11y.yml', '.github/workflows/security.yml', 'renovate.json']
+  pull_request:
+    paths-ignore: ['**.md', '!a11y.md', '.github/workflows/a11y.yml', '.github/workflows/security.yml', 'renovate.json']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      # Skip the puppeteer Chrome download; build/tests don't need a browser.
+      - run: pnpm install --frozen-lockfile
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+      - run: pnpm check
+      - run: pnpm test
+      - run: pnpm build
+      # Reuse this exact build for the deploy job (main only).
+      - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

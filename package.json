@@ -1,0 +1,53 @@
+{
+    "name": "calctainer",
+    "version": "1.0.0",
+    "description": "Browser-only capacity planner for HyperShift / HCP hosted-cluster workloads",
+    "scripts": {
+        "a11y:html": "node scripts/build-a11y.mjs",
+        "predev": "pnpm a11y:html",
+        "dev": "vite",
+        "prebuild": "pnpm a11y:html",
+        "build": "vite build",
+        "preview": "vite preview",
+        "check": "svelte-check --tsconfig ./tsconfig.json",
+        "test": "vitest run",
+        "a11y": "pa11y http://localhost:5173",
+        "a11y:ci": "pa11y-ci http://localhost:5173",
+        "a11y:ci:all": "pa11y-ci --config .pa11yci.json http://localhost:5173",
+        "lighthouse": "lighthouse http://localhost:5173 --only-categories=accessibility --output=html --output-path=./lighthouse-report.html --chrome-flags=\"--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage\"",
+        "lighthouse:ci": "lighthouse http://localhost:5173 --only-categories=accessibility --output=json --output-path=./lighthouse-report.json --chrome-flags=\"--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage\""
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devEngines": {
+        "packageManager": {
+            "name": "pnpm",
+            "version": "12.16.1",
+            "onFail": "download"
+        }
+    },
+    "packageManager": "pnpm@12.16.1",
+    "type": "module",
+    "devDependencies": {
+        "@fontsource-variable/red-hat-display": "^5.3.0",
+        "@fontsource-variable/red-hat-mono": "^5.3.0",
+        "@lucide/svelte": "^1.66.0",
+        "@skeletonlabs/skeleton": "^5.0.1",
+        "@skeletonlabs/skeleton-svelte": "^5.0.1",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "@tailwindcss/vite": "^4.3.3",
+        "@tsconfig/svelte": "^5.0.8",
+        "lighthouse": "^13.6.0",
+        "marked": "^18.1.2",
+        "pa11y": "^10.0.0",
+        "pa11y-ci": "^5.0.0",
+        "svelte": "^5.57.3",
+        "svelte-check": "^4.7.7",
+        "tailwindcss": "^4.3.3",
+        "tslib": "^2.9.1",
+        "typescript": "^6.0.3",
+        "vite": "^8.3.5",
+        "vitest": "^5.0.5"
+    }
+}

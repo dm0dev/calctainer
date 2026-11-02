@@ -1,0 +1,187 @@
+@import 'tailwindcss';
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton-svelte';
+@import './theme-ledger.css';
+
+@import '@fontsource-variable/red-hat-display';
+@import '@fontsource-variable/red-hat-mono';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+	--font-sans: 'Red Hat Display Variable', 'Red Hat Display', ui-sans-serif, sans-serif;
+	--font-display: 'Red Hat Display Variable', 'Red Hat Display', ui-sans-serif, sans-serif;
+	--font-mono: 'Red Hat Mono Variable', ui-monospace, monospace;
+}
+
+:root {
+	/* Resource semantic colours — used consistently across every chart. */
+	--res-cpu: var(--color-primary-500);
+	--res-mem: var(--color-secondary-500);
+	--res-storage: var(--color-tertiary-700);
+}
+.dark {
+	/* Lighter resource colours for dark mode to meet WCAG 2.0 AA contrast (4.5:1). */
+	--res-cpu: var(--color-primary-400);
+	--res-mem: var(--color-secondary-300);
+	--res-storage: var(--color-tertiary-300);
+}
+
+html,
+body {
+	min-height: 100%;
+}
+
+body {
+	font-size: 13.5px;
+	background-color: var(--color-surface-50);
+}
+.dark body {
+	background-color: var(--color-surface-950);
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+	font-family: var(--font-display);
+	font-optical-sizing: auto;
+}
+
+.num {
+	font-family: var(--font-mono);
+	font-variant-numeric: tabular-nums;
+	font-feature-settings: 'zero' 1;
+}
+
+/* Ledger "sheet": a slightly lifted paper card with a hard offset shadow. */
+.sheet {
+	background: var(--color-surface-50);
+	border: 1px solid var(--color-surface-300);
+	box-shadow: 4px 4px 0 0 color-mix(in oklab, var(--color-surface-950) 10%, transparent);
+	border-radius: var(--radius-container);
+}
+.dark .sheet {
+	background: color-mix(in oklab, var(--color-surface-900) 92%, black);
+	border-color: var(--color-surface-800);
+	box-shadow: 4px 4px 0 0 rgb(0 0 0 / 0.45);
+}
+
+.eyebrow {
+	font-family: var(--font-mono);
+	text-transform: uppercase;
+	letter-spacing: 0.14em;
+	font-size: 10.5px;
+	color: var(--color-surface-600);
+}
+.dark .eyebrow {
+	color: var(--color-surface-400);
+}
+
+.hatch {
+	background-image: repeating-linear-gradient(-45deg, currentColor 0 1.5px, transparent 1.5px 5px);
+}
+
+/* Compact ledger inputs for dense tables. */
+.cell-input {
+	width: 100%;
+	min-width: 0;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	padding: 2px 6px;
+	font-family: var(--font-mono);
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+	outline: none;
+	transition:
+		border-color 120ms,
+		background 120ms;
+}
+.cell-input.text-left {
+	text-align: left;
+}
+.cell-input:hover {
+	border-color: var(--color-surface-300);
+}
+.cell-input:focus {
+	border-color: var(--color-primary-500);
+	background: color-mix(in oklab, var(--color-primary-500) 7%, transparent);
+}
+.dark .cell-input:hover {
+	border-color: var(--color-surface-700);
+}
+select.cell-input {
+	text-align: left;
+	appearance: auto;
+}
+.dark select.cell-input option {
+	background: var(--color-surface-900);
+}
+
+/* Staggered page-load reveal. */
+@keyframes rise {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+.reveal > * {
+	animation: rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.reveal > *:nth-child(2) {
+	animation-delay: 50ms;
+}
+.reveal > *:nth-child(3) {
+	animation-delay: 100ms;
+}
+.reveal > *:nth-child(4) {
+	animation-delay: 150ms;
+}
+.reveal > *:nth-child(5) {
+	animation-delay: 200ms;
+}
+.reveal > *:nth-child(n + 6) {
+	animation-delay: 250ms;
+}
+
+@keyframes grow-x {
+	from {
+		transform: scaleX(0);
+	}
+}
+@keyframes grow-y {
+	from {
+		transform: scaleY(0);
+	}
+}
+.grow-x {
+	transform-origin: left;
+	animation: grow-x 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.grow-y {
+	transform-origin: bottom;
+	animation: grow-y 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.reveal > *,
+	.grow-x,
+	.grow-y {
+		animation: none !important;
+	}
+}
+
+@media print {
+	body {
+		background: white !important;
+	}
+	.no-print {
+		display: none !important;
+	}
+}
