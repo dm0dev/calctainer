@@ -70,7 +70,7 @@
 	</div>
 {/snippet}
 
-<section class="reveal space-y-5">
+<section class="reveal space-y-8">
 	<SectionHead
 		no="07"
 		title="Assumptions"
@@ -78,10 +78,10 @@
 		guided="These settings are maintained by your platform team. Switch to Standard or Expert mode to change them."
 	/>
 
-	<fieldset disabled={locked} class="space-y-5 {locked ? 'opacity-80' : ''}">
+	<fieldset disabled={locked} class="space-y-8 {locked ? 'opacity-80' : ''}">
 		{#if locked}<p class="flex items-center gap-2 text-xs text-surface-600-400"><Lock class="size-3.5" /> {tr('read-only in guided mode')}</p>{/if}
 
-		<div class="grid gap-4 lg:grid-cols-3">
+		<div class="grid gap-6 lg:grid-cols-3">
 			<article class="sheet space-y-4 p-5">
 				<h3 class="text-lg font-bold">{tr('Sizing policy')}</h3>
 				<NumField label={tr('Target utilisation')} bind:value={app.scenario.assumptions.targetUtilization} pct step={5} max={100} hint={tr('Nodes are filled to this share of allocatable when sizing. Keeps room for bursts and rolling updates.')}>
@@ -113,7 +113,7 @@
 							{ v: 'spread', l: 'Spread (default)' },
 							{ v: 'binpack', l: 'Bin-pack' }
 						])}
-						<p class="mt-1 text-[11px] text-surface-600-400">{tr('Spread ≈ LeastAllocated (OpenShift default); bin-pack ≈ MostAllocated.')}</p>
+						<p class="mt-1 text-xs text-surface-600-400">{tr('Spread ≈ LeastAllocated (OpenShift default); bin-pack ≈ MostAllocated.')}</p>
 					</div>
 				{/if}
 			</article>
@@ -145,13 +145,13 @@
 						<NumField label={tr('Memory limit warning threshold')} bind:value={app.scenario.assumptions.memLimitOvercommitWarn} unit="×" step={0.05} />
 						<NumField label={tr('Under-utilised below')} bind:value={app.scenario.assumptions.underUtilizedThreshold} pct step={5} />
 					</div>
-					<p class="text-[11px] text-surface-600-400">{tr('The sum of configured memory limits is compared with allocatable pool memory. It is not actual memory usage or extra RAM; below Expert, the warning threshold is fixed at 100%.')}</p>
+					<p class="text-xs text-surface-600-400">{tr('The sum of configured memory limits is compared with allocatable pool memory. It is not actual memory usage or extra RAM; below Expert, the warning threshold is fixed at 100%.')}</p>
 				{/if}
 			</article>
 
 			<article class="sheet space-y-4 p-5">
 				<h3 class="text-lg font-bold">{tr('Pricing')}</h3>
-				<p class="text-[12px] text-surface-700-300">{tr('Used for instance types without an explicit monthly price (e.g. on-prem / KubeVirt).')}</p>
+				<p class="text-xs text-surface-700-300">{tr('Used for instance types without an explicit monthly price (e.g. on-prem / KubeVirt).')}</p>
 				<div class="grid grid-cols-2 gap-3">
 					<NumField label={tr('Per vCPU / month')} bind:value={app.scenario.assumptions.pricePerVcpu} unit={a.currency} step={1} />
 					<NumField label={tr('Per GiB / month')} bind:value={app.scenario.assumptions.pricePerGiB} unit={a.currency} step={0.5} />
@@ -160,7 +160,7 @@
 					<span class="label-text text-xs font-medium text-surface-700-300">{tr('Currency symbol')}</span>
 					<input class="input field-sm w-24" bind:value={app.scenario.assumptions.currency} maxlength="4" />
 				</label>
-				<p class="border-t border-dashed border-surface-300-700 pt-3 text-[11px] text-surface-600-400">
+				<p class="border-t border-dashed border-surface-300-700 pt-3 text-xs text-surface-600-400">
 					{tr('Preset prices are rough on-demand list prices. Replace them with contract prices for a realistic savings estimate.')}
 				</p>
 			</article>
@@ -182,7 +182,7 @@
 					</div>
 				{/if}
 			</header>
-			<table class="num w-full min-w-[760px] text-[12px]">
+			<table class="num w-full min-w-[760px] text-xs">
 				<thead class="eyebrow text-left">
 					<tr class="[&>th]:px-2 [&>th]:py-2 [&>th]:font-medium">
 						<th class="w-10 text-center">{tr('Use')}</th><th>{tr('Name')}</th><th>{tr('Family')}</th><th class="text-right">vCPU</th><th class="text-right">{tr('Memory GiB')}</th><th class="text-right"
@@ -197,7 +197,7 @@
 						<tr class="border-t border-surface-200-800 [&>td]:px-1 [&>td]:py-1 {a.allowedTypeIds.includes(t.id) ? '' : 'text-surface-500'}">
  						<td class="text-center"><input type="checkbox" class="checkbox" checked={a.allowedTypeIds.includes(t.id)} onchange={() => toggleAllowed(t.id)} aria-label={tr('Allow {name}').replace('{name}', t.name)} /></td>
  						<td>{#if expert}<input class="cell-input text-left! font-semibold" bind:value={t.name} aria-label={tr('Type name')} />{:else}<span class="px-1.5 font-semibold">{t.name}</span>{/if}</td>
-							<td class="font-sans text-[11px]">{t.family}</td>
+							<td class="font-sans text-xs">{t.family}</td>
  						<td class="w-20">{#if expert}<NumCell bind:value={t.vcpu} min={1} title="vCPU" />{:else}<span class="block text-right">{t.vcpu}</span>{/if}</td>
  						<td class="w-24">{#if expert}<NumCell bind:value={t.memoryGiB} min={1} title={tr('Memory GiB')} />{:else}<span class="block text-right">{t.memoryGiB}</span>{/if}</td>
 							<td class="text-right text-surface-500">{fmt(rv.cpu, 2)}c · {fmt(rv.mem)}G</td>

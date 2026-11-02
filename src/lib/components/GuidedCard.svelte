@@ -41,11 +41,11 @@
 		<header class="flex items-center gap-3">
 			<span class="grid size-9 shrink-0 place-items-center rounded-base text-surface-950" style="background:{color}"><Server class="size-5" /></span>
 			<input class="cell-input text-left! font-display text-lg font-bold" bind:value={w.name} aria-label={t('Application name')} />
-			{#if w.preset?.vendor === 'redhat'}<span class="badge preset-filled-primary-700 shrink-0 px-1.5 py-0 text-[10px]" title={w.preset.label}>{t('Red Hat operator')}</span>{/if}
+			{#if w.preset?.vendor === 'redhat'}<span class="badge preset-filled-primary-700 shrink-0 px-1.5 py-0 text-xs" title={w.preset.label}>{t('Red Hat operator')}</span>{/if}
 			{#if onnamespace}
-				<label class="flex shrink-0 items-center gap-1 text-[11px] text-surface-600-400">
+				<label class="flex shrink-0 items-center gap-1 text-xs text-surface-600-400">
 					<Term k="namespace">{t('Group')}</Term>
-					<input class="cell-input w-36! text-left! text-[12px]" list="ns-names" value={namespaceOf(w)} onchange={onnamespace} aria-label={t('Group (namespace) of {name}').replace('{name}', w.name)} spellcheck="false" />
+					<input class="cell-input w-36! text-left! text-xs" list="ns-names" value={namespaceOf(w)} onchange={onnamespace} aria-label={t('Group (namespace) of {name}').replace('{name}', w.name)} spellcheck="false" />
 				</label>
 			{/if}
 			<button class="btn-icon btn-icon-sm hover:preset-tonal-error" onclick={onremove} title={t('Remove application')} aria-label={t('Remove application')}><Trash2 class="size-4" /></button>
@@ -90,7 +90,7 @@
 							onclick={() => set('availability', k as Availability)}
 						>
 							<div class="text-sm font-semibold">{t(a.label)}</div>
-							<div class="text-[11px] leading-snug text-surface-600-400">{t(a.plain)}</div>
+							<div class="text-xs leading-snug text-surface-600-400">{t(a.plain)}</div>
 						</button>
 					{/each}
 				</div>

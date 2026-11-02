@@ -84,7 +84,7 @@
 	}
 </script>
 
-<section class="reveal space-y-5">
+<section class="reveal space-y-8">
 	<SectionHead
 		no="02"
 		title={mode === 'guided' ? 'Servers you need' : 'Node pools'}
@@ -114,11 +114,11 @@
 				<div class="flex items-center justify-between border-b border-surface-200-800 px-4 py-2.5">
 					<div>
 						<div class="font-display font-bold">{tr(mode === 'guided' ? 'Your worker pool mix' : 'Custom node pools')}</div>
-						<div class="text-[11px] text-surface-600-400">{tr('Add pools with different VM flavours. Node counts and capacity are summed for this hosted cluster.')}</div>
+						<div class="text-xs text-surface-600-400">{tr('Add pools with different VM flavours. Node counts and capacity are summed for this hosted cluster.')}</div>
 					</div>
 					<button class="btn btn-sm preset-filled-primary-500" onclick={addPool} disabled={!catalog.length}><Plus class="size-4" /> {tr('Add pool')}</button>
 				</div>
-				<table class="w-full min-w-[820px] text-[12.5px]">
+				<table class="w-full min-w-[820px] text-xs">
 					<thead class="eyebrow text-left">
 						<tr class="[&>th]:px-2 [&>th]:py-2 [&>th]:font-medium">
 							<th>{tr('Name')}</th><th>{tr('Instance type')}</th><th class="text-right">{tr('Nodes')}</th><th class="text-center">{tr('Autoscale')}</th><th class="text-right">{tr('Min')}</th><th class="text-right"
@@ -158,7 +158,7 @@
 						{/each}
 					</tbody>
 				</table>
-				<p class="border-t border-surface-200-800 px-4 py-2 text-[11px] text-surface-600-400">
+				<p class="border-t border-surface-200-800 px-4 py-2 text-xs text-surface-600-400">
 					{tr('Workloads with an empty pool go to any non-dedicated pool. “Removable” = nodes a pool could drop while its pods still fit at the {target} target plus {spare} spare. Cluster totals below add up the capacity from every pool.')
 						.replace('{target}', pctFmt(a.targetUtilization)).replace('{spare}', String(a.spareNodes))}
 				</p>
@@ -175,7 +175,7 @@
 			</div>
 		{/if}
 
-		<div class="grid gap-4 xl:grid-cols-2">
+		<div class="grid gap-6 xl:grid-cols-2">
 			{#each cr.pools as p (p.name)}
 				{@const u = poolUsage(p.name)}
 				{@const pinnedId = cluster.pins[p.name]}
@@ -186,7 +186,7 @@
 							<h3 class="text-2xl font-extrabold">{p.name}</h3>
 							<div class="num text-sm text-surface-700-300">
 								{p.type.name} · {p.type.vcpu} vCPU / {p.type.memoryGiB} GiB
- 							{#if p.pinned}<span class="badge preset-tonal-primary ml-1 px-1.5 py-0 text-[10px]"><Pin class="size-3" /> {tr('pinned')}</span>{/if}
+ 							{#if p.pinned}<span class="badge preset-tonal-primary ml-1 px-1.5 py-0 text-xs"><Pin class="size-3" /> {tr('pinned')}</span>{/if}
 							</div>
 						</div>
 						<div class="text-right">
@@ -238,7 +238,7 @@
 						</div>
 
 						{#if mode !== 'guided'}
-							<dl class="num grid grid-cols-2 gap-x-6 gap-y-1 text-[11.5px] sm:grid-cols-4">
+							<dl class="num grid grid-cols-2 gap-x-6 gap-y-1 text-xs sm:grid-cols-4">
 								<div><dt class="eyebrow"><Term k="allocatable">{tr('Alloc / node')}</Term></dt><dd>{fmt(p.allocatablePerNode.cpu, 2)}c · {fmt(p.allocatablePerNode.mem)}G</dd></div>
 								<div><dt class="eyebrow"><Term k="daemonset">{tr('DS / node')}</Term></dt><dd>{fmt(p.daemonPerNode.cpu, 2)}c · {fmt(p.daemonPerNode.mem)}G</dd></div>
 								<div><dt class="eyebrow">{tr('Base · peak')}</dt><dd>{p.nodesBase} · {p.nodesPeak}</dd></div>
@@ -246,7 +246,7 @@
 							</dl>
 						{/if}
 
-						<ul class="space-y-1 text-[12.5px] leading-snug">
+						<ul class="space-y-1 text-xs leading-snug">
 							{#each p.explanation as e, i (i)}
 								<li class="flex gap-2"><span class="num text-primary-600-400">§</span><span>{tr(e)}</span></li>
 							{/each}
@@ -259,7 +259,7 @@
 								<span>{tr('Compare {count} instance types').replace('{count}', String(p.candidates.length))}</span><span class="eyebrow group-open:hidden">{tr('show')}</span><span class="eyebrow hidden group-open:inline">{tr('hide')}</span>
 							</summary>
 							<div class="overflow-x-auto px-2 pb-3">
-								<table class="num w-full text-[11.5px]">
+								<table class="num w-full text-xs">
 									<thead class="eyebrow text-left">
 										<tr class="[&>th]:px-2 [&>th]:py-1 [&>th]:font-medium">
 										<th>{tr('Type')}</th><th class="text-right">{tr('Nodes')}</th><th class="text-right">{tr('Peak')}</th><th class="w-28">CPU · Mem</th><th class="text-right">{tr('Cost/mo')}</th><th></th>
@@ -280,7 +280,7 @@
 													</td>
 													<td class="px-2 text-right">{money(c.cost, a.currency)}</td>
 												{:else}
-													<td colspan="4" class="px-2 font-sans text-[11px]">{tr(c.reason ?? 'Not feasible')}</td>
+													<td colspan="4" class="px-2 font-sans text-xs">{tr(c.reason ?? 'Not feasible')}</td>
 												{/if}
 												<td class="px-1 text-right">
 													{#if c.feasible && cluster.poolMode === 'auto'}

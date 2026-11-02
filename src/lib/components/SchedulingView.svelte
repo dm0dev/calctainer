@@ -53,7 +53,7 @@
 	const sy = (v: number) => S - P - Math.min(1.1, v) * ((S - P - 8) / 1.1);
 </script>
 
-<section class="reveal space-y-5">
+<section class="reveal space-y-8">
 	<SectionHead
 		no="03"
 		title={mode === 'guided' ? 'How apps are placed' : 'Scheduling simulation'}
@@ -87,7 +87,7 @@
 			</div>
 		{/if}
 
-		<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+		<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
 			<span class="eyebrow">{tr('Legend')}</span>
 			<span class="inline-flex items-center gap-1"><span class="hatch h-2.5 w-4 rounded-[2px] text-surface-500"></span>{tr('DaemonSets/platform')}</span>
 			{#each legend as id (id)}
@@ -122,7 +122,7 @@
 						<div
 							class="rounded-base border bg-surface-50-950 p-2 transition {n.scaled ? 'border-dashed border-primary-500' : 'border-surface-300-700'} {dim ? 'opacity-30' : ''}"
 						>
-							<div class="num mb-1.5 flex items-center justify-between text-[10.5px]">
+							<div class="num mb-1.5 flex items-center justify-between text-xs">
 								<span class="truncate font-semibold" title={n.id}>{n.id.split('/').pop()}</span>
 								<span class="text-surface-500">{n.pods.length + n.daemonPods.length}/{n.maxPods}</span>
 							</div>
@@ -130,7 +130,7 @@
 								<Meter height="h-2.5" max={n.allocatable.cpu} segments={segs(n, 'cpu')} markers={[{ value: n.allocatable.cpu * a.targetUtilization, label: tr('target') }]} title="CPU" />
 								<Meter height="h-2.5" max={n.allocatable.mem} segments={segs(n, 'mem')} markers={[{ value: n.allocatable.mem * a.targetUtilization, label: tr('target') }]} title={tr('Memory')} />
 							</div>
-							<div class="num mt-1.5 flex justify-between text-[10.5px]">
+							<div class="num mt-1.5 flex justify-between text-xs">
 								<span style="color:var(--res-cpu)">CPU {pctFmt(u.cpu)}</span>
 								<span style="color:var(--res-mem)">MEM {pctFmt(u.mem)}</span>
 							</div>
@@ -141,7 +141,7 @@
 			</div>
 		{/each}
 
-		<div class="grid gap-4 lg:grid-cols-[auto_1fr]">
+		<div class="grid gap-6 lg:grid-cols-[auto_1fr]">
 			<div class="sheet p-4">
 				<div class="eyebrow mb-2">{tr('CPU vs memory per node')}</div>
 				<svg viewBox="0 0 {S} {S}" class="w-[240px]" role="img" aria-label={tr('Scatter of CPU versus memory utilisation per node')}>
@@ -166,34 +166,34 @@
  					<circle cx={sx(u.cpu)} cy={sy(u.mem)} r="4" fill={n.scaled ? 'var(--color-primary-500)' : 'currentColor'} fill-opacity="0.55"><title>{n.id}: CPU {pctFmt(u.cpu)}, {tr('Memory')} {pctFmt(u.mem)}</title></circle>
 					{/each}
 				</svg>
-				<p class="mt-1 max-w-[240px] text-[11px] text-surface-600-400">
+				<p class="mt-1 max-w-[240px] text-xs text-surface-600-400">
 					{tr('Dots far from the diagonal mean one resource fills up while the other is')} <Term k="stranded">{tr('stranded')}</Term>.
 				</p>
 			</div>
 
-			<div class="grid gap-4">
+			<div class="grid gap-6">
 				{#if fr}
 					<div class="sheet p-4">
 						<div class="eyebrow mb-3"><Term k="fragmentation">{tr('Fragmentation')}</Term> & {tr('free capacity (baseline)')}</div>
 						<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
 							<div>
 								<div class="num text-2xl font-bold">{pctFmt(fr.index)}</div>
-  						<div class="text-[11px] text-surface-600-400">{tr('fragmentation index')}</div>
+  						<div class="text-xs text-surface-600-400">{tr('fragmentation index')}</div>
 							</div>
 							<div>
 								<div class="num text-2xl font-bold">{fr.refSlots}<span class="text-sm text-surface-500">/{fr.idealSlots}</span></div>
- 							<div class="text-[11px] text-surface-600-400">{tr('typical pods ({cpu}c/{memory}G) that still fit vs. if free space were pooled').replace('{cpu}', fmt(fr.refPod.cpu, 2)).replace('{memory}', fmt(fr.refPod.mem))}</div>
+ 							<div class="text-xs text-surface-600-400">{tr('typical pods ({cpu}c/{memory}G) that still fit vs. if free space were pooled').replace('{cpu}', fmt(fr.refPod.cpu, 2)).replace('{memory}', fmt(fr.refPod.mem))}</div>
 							</div>
 							<div>
 								<div class="num text-2xl font-bold" style="color:var(--res-cpu)">{fmt(fr.freeCpu)}<span class="text-sm"> c</span></div>
- 							<div class="text-[11px] text-surface-600-400">{tr('free CPU · {amount} stranded').replace('{amount}', fmt(fr.strandedCpu))}</div>
+ 							<div class="text-xs text-surface-600-400">{tr('free CPU · {amount} stranded').replace('{amount}', fmt(fr.strandedCpu))}</div>
 							</div>
 							<div>
 								<div class="num text-2xl font-bold" style="color:var(--res-mem)">{fmt(fr.freeMem)}<span class="text-sm"> GiB</span></div>
- 							<div class="text-[11px] text-surface-600-400">{tr('free memory · {amount} stranded').replace('{amount}', fmt(fr.strandedMem))}</div>
+ 							<div class="text-xs text-surface-600-400">{tr('free memory · {amount} stranded').replace('{amount}', fmt(fr.strandedMem))}</div>
 							</div>
 						</div>
-						<p class="mt-3 text-[11px] text-surface-600-400">
+						<p class="mt-3 text-xs text-surface-600-400">
 							{tr('Workload demand ratio is {ratio} GiB per core. Stranded capacity is free CPU without matching memory (or vice versa) at that ratio.').replace('{ratio}', fmt(fr.demandRatio))}
 						</p>
 					</div>
@@ -201,7 +201,7 @@
 
 				<div class="sheet overflow-x-auto">
 					<div class="eyebrow px-4 pt-3">{tr('Scaling headroom per workload')}</div>
-					<table class="num w-full text-[12px]">
+					<table class="num w-full text-xs">
 						<thead class="eyebrow text-left">
 							<tr class="[&>th]:px-3 [&>th]:py-2 [&>th]:font-medium">
 								<th>{tr('Workload')}</th><th class="text-right">{tr('Replicas')}</th><th class="text-right"><Term k="hpa">{tr('HPA max')}</Term></th><th class="text-right">+ {tr('on current nodes')}</th><th

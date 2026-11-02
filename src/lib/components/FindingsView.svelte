@@ -28,7 +28,7 @@
 	} as const);
 </script>
 
-<section class="reveal space-y-5">
+<section class="reveal space-y-8">
 	<SectionHead
 		no="05"
 		title={guided ? 'Check-up' : 'Findings'}
@@ -76,11 +76,11 @@
 							<div class="min-w-0 flex-1">
 								<div class="flex flex-wrap items-baseline gap-x-2">
  								<h4 class="font-display font-bold">{translate(f.title, app.ui.language)}</h4>
-									{#if f.clusterId}<span class="num text-[11px] text-surface-500">{clusterName.get(f.clusterId)}</span>{/if}
+									{#if f.clusterId}<span class="num text-xs text-surface-500">{clusterName.get(f.clusterId)}</span>{/if}
 								</div>
-								<p class="text-[12.5px] text-surface-800-200">{translate(guided && f.plain ? f.plain : f.detail, app.ui.language)}</p>
+								<p class="text-xs text-surface-800-200">{translate(guided && f.plain ? f.plain : f.detail, app.ui.language)}</p>
 								{#if f.action}
-									<p class="mt-1 text-[12px]"><span class="font-semibold text-primary-600-400">→ </span>{translate(f.action, app.ui.language)}</p>
+									<p class="mt-1 text-xs"><span class="font-semibold text-primary-600-400">→ </span>{translate(f.action, app.ui.language)}</p>
 								{/if}
 							</div>
 						</div>

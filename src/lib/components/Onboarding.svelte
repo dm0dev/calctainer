@@ -54,7 +54,7 @@
 						</select>
 					</label>
 				</div>
-				<Dialog.Title class="mt-1 text-3xl font-extrabold md:text-4xl" style="color:#151515">{translate('Plan workloads on Hosted Control Planes.', app.ui.language)}</Dialog.Title>
+				<Dialog.Title class="mt-1 text-3xl font-extrabold " style="color:#151515">{translate('Plan workloads on Hosted Control Planes.', app.ui.language)}</Dialog.Title>
 				<Dialog.Description class="mt-2 max-w-2xl text-sm" style="color:#4f4f4f">
 					{translate('Size worker node pools, check quotas and scheduling, and estimate savings versus classic OpenShift — entirely in your browser. How familiar are you with Kubernetes?', app.ui.language)}
 				</Dialog.Description>
@@ -67,7 +67,7 @@
 							<m.icon class="mb-3 size-6 text-primary-600-400" />
 							<div class="font-display text-xl font-extrabold">{m.l}</div>
  						<div class="eyebrow mt-0.5 mb-2" style="color:#4f4f4f">{m.who}</div>
-							<p class="text-[12.5px] leading-snug text-surface-700-300">{m.d}</p>
+							<p class="text-xs leading-snug text-surface-700-300">{m.d}</p>
 						</button>
 					{/each}
 				</div>

@@ -54,10 +54,10 @@
 						segments={[{ value: l.used, color: COLOR[l.resource], label: tr('consumed') }]}
 						title={`${tr(LABEL[l.resource])} ${tr('consumption')}`}
 					/>
-					<div class="num flex flex-wrap gap-x-4 text-[11px] text-surface-600-400">
+					<div class="num flex flex-wrap gap-x-4 text-xs text-surface-600-400">
 						<span><strong class="text-surface-950-50">{fmt(l.used)}</strong> {tr(UNIT[l.resource])} {tr('consumed')}{l.quota != null ? ` ${tr('of')} ${fmt(l.quota)}` : ''}</span>
 					</div>
-					{#if l.quota == null}<div class="text-[11px] text-surface-500 italic">{tr('no quota set')}</div>{/if}
+					{#if l.quota == null}<div class="text-xs text-surface-500 italic">{tr('no quota set')}</div>{/if}
 				</div>
 			</div>
 		{/each}
@@ -71,7 +71,7 @@
 	</div>
 {/snippet}
 
-<section class="reveal space-y-5">
+<section class="reveal space-y-8">
 	<SectionHead
 		no="04"
 		title={mode === 'guided' ? 'Budget check' : 'Quota consumption'}
@@ -82,7 +82,7 @@
 	<div class="sheet p-4">
 		<div class="eyebrow mb-2"><Term k="quota">{tr('Quota')}</Term> · {tr('Peak worker-VM capacity')}</div>
 		<p class="text-sm text-surface-600-400">{tr('CPU/RAM = sum of each pool’s VM count × full instance capacity. Recommended pools use peak demand plus spare nodes; custom autoscaling pools use their maximum, fixed pools their configured count. This is potential peak capacity, not the current order or workload requests/limits.')}</p>
-		<p class="mt-2 text-[11px] text-surface-600-400">{tr('Storage is separate: peak PVC requests, including DaemonSets at the pool maximum. VM disks are not modelled. Automatic calculation only sets CPU/RAM quotas; scheduling shortages remain visible in Findings.')}</p>
+		<p class="mt-2 text-xs text-surface-600-400">{tr('Storage is separate: peak PVC requests, including DaemonSets at the pool maximum. VM disks are not modelled. Automatic calculation only sets CPU/RAM quotas; scheduling shortages remain visible in Findings.')}</p>
 	</div>
 
 	<article class="sheet p-5">
@@ -99,7 +99,7 @@
 		{@render gauges(r.quota, app.scenario.scenarioQuota, app.scenario.name)}
 	</article>
 
-	<div class="grid gap-4 xl:grid-cols-2">
+	<div class="grid gap-6 xl:grid-cols-2">
 		{#each app.scenario.clusters as c (c.id)}
 			{@const cr = r.clusters.find((x) => x.clusterId === c.id)}
 			{#if cr}

@@ -38,7 +38,7 @@
 	}
 </script>
 
-<section class="reveal space-y-5">
+<section class="reveal space-y-8">
 	<SectionHead
 		no="06"
 		title={mode === 'guided' ? 'What you save' : 'Savings vs classic OpenShift'}
@@ -55,7 +55,7 @@
 	{#if !cb.enabled}
 		<div class="sheet p-8 text-center text-surface-600-400">{tr('Comparison is switched off.')}</div>
 	{:else}
-		<div class="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+		<div class="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
 			<article class="sheet p-5">
 				<div class="mb-4 flex flex-wrap items-center justify-between gap-2">
  				<div class="eyebrow">{tr('Footprint comparison')}</div>
@@ -66,7 +66,7 @@
 					</div>
 				</div>
 
-				<div class="space-y-5">
+				<div class="space-y-8">
 					<div>
 						<div class="mb-1 flex items-baseline justify-between">
 							<span class="font-display text-lg font-bold">Classic OpenShift</span>
@@ -76,7 +76,7 @@
 							{#each ROLES as r (r.k)}
 								{@const v = s.classicBreakdown[r.k][metric]}
 								{#if v > 0}
-									<div class="num flex items-center justify-center overflow-hidden text-[10.5px] whitespace-nowrap text-white" style="flex:{v};background:{r.c}" title="{tr(r.l)}: {show(s.classicBreakdown[r.k], metric)}">
+									<div class="num flex items-center justify-center overflow-hidden text-xs whitespace-nowrap text-white" style="flex:{v};background:{r.c}" title="{tr(r.l)}: {show(s.classicBreakdown[r.k], metric)}">
 										{tr(r.l)}
 									</div>
 								{/if}
@@ -102,12 +102,12 @@
 							<div class="num text-2xl font-extrabold {s.saved[m.v] >= 0 ? 'text-success-700-300' : 'text-error-600-400'}">
 								{s.saved[m.v] >= 0 ? '−' : '+'}{pctFmt(Math.abs(s.pct[m.v]))}
 							</div>
-							<div class="num text-[11px] text-surface-600-400">{show({ ...s.saved, [m.v]: Math.abs(s.saved[m.v]) } as Footprint, m.v)} {tr(s.saved[m.v] >= 0 ? 'saved' : 'more')}</div>
+							<div class="num text-xs text-surface-600-400">{show({ ...s.saved, [m.v]: Math.abs(s.saved[m.v]) } as Footprint, m.v)} {tr(s.saved[m.v] >= 0 ? 'saved' : 'more')}</div>
 						</div>
 					{/each}
 				</div>
 
-				<ul class="mt-4 space-y-1 text-[11.5px] text-surface-600-400">
+				<ul class="mt-4 space-y-1 text-xs text-surface-600-400">
 					{#each s.notes as n, i (i)}<li>· {tr(n)}</li>{/each}
 				</ul>
 			</article>
@@ -124,7 +124,7 @@
 				</div>
 
 				{#if cb.mode === 'derived'}
-					<p class="text-[12px] text-surface-700-300">
+					<p class="text-xs text-surface-700-300">
 						{tr('Assumes each hosted cluster replaces one classic cluster with its own control-plane and infra nodes, plus extra worker capacity typical for siloed classic clusters.')}
 					</p>
 					<div class="grid grid-cols-2 gap-3">
@@ -146,8 +146,8 @@
 						</label>
 					</div>
 				{:else}
-					<p class="text-[12px] text-surface-700-300">{tr('Enter the actual node inventory of the classic clusters being migrated.')}</p>
-					<table class="w-full text-[12.5px]">
+					<p class="text-xs text-surface-700-300">{tr('Enter the actual node inventory of the classic clusters being migrated.')}</p>
+					<table class="w-full text-xs">
 						<thead class="eyebrow text-left"><tr><th class="py-1">{tr('Role')}</th><th>{tr('Type')}</th><th class="text-right">{tr('Count')}</th><th></th></tr></thead>
 						<tbody>
 							{#each cb.inventory as g (g.id)}
@@ -178,7 +178,7 @@
 						<button class="btn btn-sm preset-tonal" onclick={() => addGroup('worker')}><Plus class="size-3.5" /> {tr('Workers')}</button>
 					</div>
 				{/if}
-				<p class="border-t border-dashed border-surface-300-700 pt-3 text-[11px] text-surface-600-400">
+				<p class="border-t border-dashed border-surface-300-700 pt-3 text-xs text-surface-600-400">
 					{tr('Out of scope:')} <Term k="hcp">{tr('hosted control plane')}</Term> pods and the management cluster. {tr('Their shared cost should be allocated separately.')}
 				</p>
 			</article>

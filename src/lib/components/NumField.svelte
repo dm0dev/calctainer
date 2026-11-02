@@ -64,5 +64,5 @@
 		<input class="input field-sm num text-right" type="number" {step} {min} {max} value={shown} placeholder={localizedPlaceholder} oninput={onInput} />
 		{#if unit || pct}<span class="label preset-tonal num w-auto! text-xs">{pct ? '%' : localizedUnit}</span>{/if}
 	</div>
-	{#if hint}<span class="mt-1 block text-[11px] leading-snug text-surface-600-400">{localizedHint}</span>{/if}
+	{#if hint}<span class="mt-1 block text-xs leading-snug text-surface-600-400">{localizedHint}</span>{/if}
 </label>

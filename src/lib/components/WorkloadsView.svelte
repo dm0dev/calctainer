@@ -184,7 +184,7 @@
 	}
 </script>
 
-<section class="reveal space-y-5">
+<section class="reveal space-y-8">
 	<SectionHead
 		no="01"
 		title={mode === 'guided' ? 'Your applications' : 'Workloads'}
@@ -219,15 +219,15 @@
 		<div class="space-y-2">
 			<div class="flex flex-wrap items-center gap-2" role="group" aria-label={t('Official Red Hat operator presets')}>
 				<span class="eyebrow mr-1 flex items-center gap-1.5"
-					><span class="badge preset-filled-primary-700 px-1.5 py-0 text-[10px] tracking-wide">Red Hat</span> {t('Official operators')}</span
+					><span class="badge preset-filled-primary-700 px-1.5 py-0 text-xs tracking-wide">Red Hat</span> {t('Official operators')}</span
 				>
 				{#each REDHAT_PRESETS as p (p.id)}
 					<button class="chip preset-tonal-primary border border-primary-500/40 hover:preset-filled-primary-500" title={presetTitle(p.id)} onclick={() => addPreset(p.id)}>
-						<Plus class="size-3" />{p.label}<span class="num text-[10px] opacity-70">×{p.components.length}</span>
+						<Plus class="size-3" />{p.label}<span class="num text-xs opacity-70">×{p.components.length}</span>
 					</button>
 				{/each}
 			</div>
-			<details class="text-[11.5px] text-surface-700-300">
+			<details class="text-xs text-surface-700-300">
 				<summary class="cursor-pointer select-none text-surface-600-400">{t('Red Hat preset sources, value provenance and exclusions')}</summary>
 				<p class="mt-2 max-w-3xl">
 					{t('Each preset adds one workload per operator/operand pod with its default configuration. Values come from Red Hat documentation where stated, otherwise from the upstream operator defaults; components without requests get a planner allowance of {cpu} CPU / {memory} GiB request. Verify against your installed version.')
@@ -237,7 +237,7 @@
 					{#each REDHAT_PRESETS as p (p.id)}
 						<li class="rounded-base border border-surface-200-800 p-2">
 							<div class="font-semibold">{p.product}</div>
-							<div class="text-[10.5px] text-surface-600-400">
+							<div class="text-xs text-surface-600-400">
 								{[...new Set(p.components.map((c) => translate(BASIS_LABEL[c.basis], app.ui.language)))].join(' · ')}
 							</div>
 							<ul class="mt-1 space-y-0.5">
@@ -268,7 +268,7 @@
 		</datalist>
 		{#if mode === 'guided'}
 			{@render nsToolbar()}
-			<div class="space-y-5">
+			<div class="space-y-8">
 				{#each groups as g (g.namespace)}
 					{@const collapsed = isCollapsed(g.namespace)}
 					{@const u = groupUnsched(g.workloads)}
@@ -305,7 +305,7 @@
 		{:else}
 			{@render nsToolbar()}
 			<div class="sheet overflow-x-auto">
-				<table class="w-full min-w-[1100px] border-collapse text-[12.5px]">
+				<table class="w-full min-w-[1100px] border-collapse text-xs">
 					<thead class="border-b-2 border-surface-950-50 text-left">
 						<tr class="eyebrow [&>th]:px-2 [&>th]:py-2 [&>th]:font-medium">
 							{#if mode === 'expert'}<th class="w-8">{t('On')}</th>{/if}
@@ -329,7 +329,7 @@
 						{@const collapsed = isCollapsed(g.namespace)}
 						{@const t = g.totals}
 						<tbody>
-						<tr class="border-y border-surface-300-700 bg-surface-100-900 num text-[12px] [&>td]:px-2 [&>td]:py-1.5" title={tr('Totals over enabled workloads: per-replica values × replicas, DaemonSets × {nodes} nodes', { nodes: cr?.totals.nodes ?? 0 })}>
+						<tr class="border-y border-surface-300-700 bg-surface-100-900 num text-xs [&>td]:px-2 [&>td]:py-1.5" title={tr('Totals over enabled workloads: per-replica values × replicas, DaemonSets × {nodes} nodes', { nodes: cr?.totals.nodes ?? 0 })}>
 							{#if mode === 'expert'}
 								<td class="text-center">
 									<input
@@ -345,7 +345,7 @@
 							<td colspan="3">
 								<div class="flex items-center gap-2 whitespace-nowrap">
 									{@render nsHeading(g.namespace, collapsed, g.presetLabel)}
-										<span class="text-[11px] text-surface-600-400">{translate('{count} workloads', app.ui.language, { count: t.workloads })} · Σ</span>
+										<span class="text-xs text-surface-600-400">{translate('{count} workloads', app.ui.language, { count: t.workloads })} · Σ</span>
 								</div>
 							</td>
 							<td class="text-right font-bold">{t.pods}</td>
@@ -355,7 +355,7 @@
 							<td class="text-right font-bold" style="color:var(--res-mem)">{fmt(t.mem)}</td>
 							<td class="text-right">{fmt(t.memLim)}</td>
 							<td class="text-right" style="color:var(--res-storage)">{fmt(t.storageGiB, 0)}</td>
-							<td colspan={mode === 'expert' ? 2 : 1} class="text-[10.5px] text-surface-600-400">{translate('totals', app.ui.language)}</td>
+							<td colspan={mode === 'expert' ? 2 : 1} class="text-xs text-surface-600-400">{translate('totals', app.ui.language)}</td>
 							<td class="text-right">{@render nsStatus(groupUnsched(g.workloads), groupHpaShort(g.workloads))}</td>
 							<td>{@render nsActions(g.namespace, g.workloads.length)}</td>
 						</tr>
@@ -370,15 +370,15 @@
 									<div class="flex items-center gap-1.5">
 										<span class="size-2.5 shrink-0 rounded-[2px]" style="background:{colors.get(w.id)}"></span>
 										<input class="cell-input text-left! font-semibold" bind:value={w.name} aria-label={translate('Workload name', app.ui.language)} />
-										{#if w.guided}<span class="badge preset-filled-surface-700 px-1 py-0 text-[10px]" title={translate('Described as VM in guided mode', app.ui.language)}>VM</span>{/if}
-										{#if w.preset?.vendor === 'redhat'}<span class="badge preset-filled-primary-700 px-1 py-0 text-[10px] whitespace-nowrap" title={presetTip(w)}
+										{#if w.guided}<span class="badge preset-filled-surface-700 px-1 py-0 text-xs" title={translate('Described as VM in guided mode', app.ui.language)}>VM</span>{/if}
+										{#if w.preset?.vendor === 'redhat'}<span class="badge preset-filled-primary-700 px-1 py-0 text-xs whitespace-nowrap" title={presetTip(w)}
 												>RH · {BASIS_LABEL[w.preset.basis]}</span
 											>{/if}
 									</div>
 								</td>
 								<td class="min-w-[8rem]">
 									<input
-										class="cell-input text-left! text-[12px]"
+										class="cell-input text-left! text-xs"
 										list="ns-names"
 										value={namespaceOf(w)}
 										onchange={(e) => moveWorkload(e, w)}
@@ -387,12 +387,12 @@
 									/>
 								</td>
 								<td class="min-w-[7.5rem]">
-									<select class="cell-input text-[12px]" bind:value={w.kind} onchange={() => detach(w)} aria-label={translate('Kind', app.ui.language)}>
+									<select class="cell-input text-xs" bind:value={w.kind} onchange={() => detach(w)} aria-label={translate('Kind', app.ui.language)}>
 										{#each KINDS as k (k)}<option value={k}>{k}</option>{/each}
 									</select>
 								</td>
 								{#if w.kind === 'DaemonSet'}
-									<td colspan="2" class="text-center text-[11px] text-surface-600-400"><Term k="daemonset">{translate('one per node', app.ui.language)}</Term></td>
+									<td colspan="2" class="text-center text-xs text-surface-600-400"><Term k="daemonset">{translate('one per node', app.ui.language)}</Term></td>
 								{:else}
 									<td class="w-16 min-w-[3.5rem]"><NumCell bind:value={w.replicas} title={translate('Replicas', app.ui.language)} onchange={() => setReplicas(w, w.replicas)} /></td>
 									<td class="w-16 min-w-[3.5rem]"><NumCell bind:value={w.maxReplicas} min={w.replicas} title={translate('HPA max replicas', app.ui.language)} onchange={() => detach(w)} /></td>
@@ -403,7 +403,7 @@
 								<td class="w-20 min-w-[4.25rem]"><NumCell bind:value={w.memLimitGiB} step={0.25} nullable placeholder={translate('none', app.ui.language)} title={translate('Memory limit (GiB)', app.ui.language)} onchange={() => detach(w)} /></td>
 								<td class="w-20 min-w-[4.25rem]"><NumCell bind:value={w.storageGiB} step={10} title={translate('PVC storage per replica (GiB)', app.ui.language)} onchange={() => detach(w)} /></td>
 								<td class="min-w-[8rem]">
-									<select class="cell-input text-[12px]" bind:value={w.antiAffinity} onchange={() => detach(w)} aria-label={translate('Anti-affinity', app.ui.language)}>
+									<select class="cell-input text-xs" bind:value={w.antiAffinity} onchange={() => detach(w)} aria-label={translate('Anti-affinity', app.ui.language)}>
 										{#each ANTI as a (a.v)}<option value={a.v}>{a.l}</option>{/each}
 									</select>
 								</td>
@@ -412,7 +412,7 @@
 										<input class="cell-input text-left!" list="pool-names" bind:value={w.pool} placeholder={translate(w.kind === 'DaemonSet' ? 'all nodes' : 'any general', app.ui.language)} aria-label={translate('Target node pool', app.ui.language)} />
 									</td>
 								{/if}
-								<td class="num text-right text-[11px] whitespace-nowrap">
+								<td class="num text-right text-xs whitespace-nowrap">
 									{#if !w.enabled}
 										<span class="text-surface-500">{translate('off', app.ui.language)}</span>
 									{:else if u > 0}
@@ -440,7 +440,7 @@
 							{#if yamlOpen === w.id}
 								<tr class="border-b border-surface-200-800 bg-surface-100-900/70">
 									<td colspan={mode === 'expert' ? 15 : 13} class="p-3">
-										<pre class="num max-h-80 overflow-auto rounded-base bg-surface-950 p-3 text-[11.5px] leading-relaxed text-surface-100">{workloadYaml(w)}</pre>
+										<pre class="num max-h-80 overflow-auto rounded-base bg-surface-950 p-3 text-xs leading-relaxed text-surface-100">{workloadYaml(w)}</pre>
 									</td>
 								</tr>
 							{/if}
@@ -452,7 +452,7 @@
 						</tbody>
 					{/each}
 					{#if list.length}
-						<tfoot class="num border-t-2 border-surface-950-50 text-[12px] font-bold">
+						<tfoot class="num border-t-2 border-surface-950-50 text-xs font-bold">
 							<tr class="[&>td]:px-2 [&>td]:py-2">
 								{#if mode === 'expert'}<td></td>{/if}
  							<td colspan="3" class="eyebrow">Σ {translate('requested', app.ui.language)} · {sums.pods} {translate('pods', app.ui.language)}</td>
@@ -463,7 +463,7 @@
 								<td class="text-right" style="color:var(--res-mem)">{fmt(sums.mem)}</td>
 								<td class="text-right font-normal">{fmt(sums.memL)}</td>
 								<td class="text-right" style="color:var(--res-storage)">{fmt(sums.st, 0)}</td>
-								<td colspan={mode === 'expert' ? 4 : 3} class="text-[10.5px] font-normal text-surface-600-400">{translate('totals × replicas (DaemonSets × {nodes} nodes)', app.ui.language, { nodes: cr?.totals.nodes ?? 0 })}</td>
+								<td colspan={mode === 'expert' ? 4 : 3} class="text-xs font-normal text-surface-600-400">{translate('totals × replicas (DaemonSets × {nodes} nodes)', app.ui.language, { nodes: cr?.totals.nodes ?? 0 })}</td>
 							</tr>
 						</tfoot>
 					{/if}
@@ -473,7 +473,7 @@
 				</datalist>
 			</div>
 			{#if mode === 'expert'}
-				<p class="text-[11px] text-surface-600-400">
+				<p class="text-xs text-surface-600-400">
 					<ChevronDown class="inline size-3" /> {tr('A workload with a pool name lands on a dedicated (tainted) pool of that name; empty means any general pool. Missing limits are counted as equal to requests in limit totals.')}
 				</p>
 			{/if}
@@ -513,16 +513,16 @@
 		aria-label={tr('Rename namespace {namespace}', { namespace: ns })}
 		spellcheck="false"
 	/>
-	{#if presetLabel}<span class="badge preset-filled-primary-700 px-1.5 py-0 text-[10px] whitespace-nowrap" title={tr('All workloads come from this Red Hat operator preset')}>Red Hat · {presetLabel}</span>{/if}
+	{#if presetLabel}<span class="badge preset-filled-primary-700 px-1.5 py-0 text-xs whitespace-nowrap" title={tr('All workloads come from this Red Hat operator preset')}>Red Hat · {presetLabel}</span>{/if}
 {/snippet}
 
 {#snippet nsStatus(pending: number, hpaShort: number)}
 	{#if pending > 0}
-		<span class="badge preset-filled-error-500 px-1.5 py-0 text-[11px]">{tr('{count} pending', { count: pending })}</span>
+		<span class="badge preset-filled-error-500 px-1.5 py-0 text-xs">{tr('{count} pending', { count: pending })}</span>
 	{:else if hpaShort > 0}
-		<span class="badge preset-filled-warning-500 px-1.5 py-0 text-[11px]" title={tr('Workloads whose HPA maximum cannot be reached')}>{tr('{count} peak short', { count: hpaShort })}</span>
+		<span class="badge preset-filled-warning-500 px-1.5 py-0 text-xs" title={tr('Workloads whose HPA maximum cannot be reached')}>{tr('{count} peak short', { count: hpaShort })}</span>
 	{:else}
-		<span class="text-[11px] text-success-700-300">✓ {tr('fits')}</span>
+		<span class="text-xs text-success-700-300">✓ {tr('fits')}</span>
 	{/if}
 {/snippet}
 
