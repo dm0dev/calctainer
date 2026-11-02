@@ -3,7 +3,7 @@ import { analyzeScenario } from './analyze';
 import { CATALOGS } from './catalog';
 import { defaultAssumptions, newCluster, newPool, newWorkload, sampleScenario } from './defaults';
 import { translateGuided } from './guided';
-import { csvToWorkloads, parseCpu, parseMem, workloadsToCsv } from './io';
+import { csvToWorkloads, parseCpu, parseMem, scenarioError, workloadsToCsv } from './io';
 import { allocatable, reserved } from './nodes';
 import { recommendPools } from './recommend';
 import { buildNodes, schedule } from './scheduler';
@@ -183,7 +183,7 @@ describe('scenario analysis', () => {
 		expect(r.clusters[0].removableNodes.workers).toBeGreaterThan(5);
 		expect(r.findings.some((f) => f.category === 'over')).toBe(true);
 	});
-	it('computes quota consumption per basis', () => {
+	it('checks VM capacity regardless of the legacy workload quota basis', () => {
 		const s = scenario();
 		s.clusters[0].quota = { cpu: 4, memGiB: 1000, storageGiB: 10 };
 		s.workloads = [newWorkload(s.clusters[0].id, { replicas: 2, storageGiB: 20 })];
@@ -194,7 +194,9 @@ describe('scenario analysis', () => {
 		expect(r.findings.some((f) => f.category === 'quota' && f.severity === 'critical')).toBe(true);
 		s.assumptions = { ...s.assumptions, quotaBasis: 'requests' };
 		const r2 = analyzeScenario(s);
-		expect(r2.clusters[0].quota[0].used).toBeCloseTo(1, 5);
+		expect(r2.clusters[0].quota).toEqual(q);
+		s.assumptions.quotaBasis = 'limits';
+		expect(analyzeScenario(s).clusters[0].quota).toEqual(q);
 	});
 	it('reports node-failure stranding when no spare exists', () => {
 		const s = scenario();
@@ -214,6 +216,160 @@ describe('scenario analysis', () => {
 		const r = analyzeScenario(s);
 		expect(r.clusters[0].totals.pods).toBe(4);
 		expect(r.clusters[0].totals.reqCpu).toBeCloseTo(0.4, 5);
+	});
+});
+
+describe('infrastructure quotas', () => {
+	function mixedPools(): Scenario {
+		const s = scenario();
+		const c = s.clusters[0];
+		c.poolMode = 'manual';
+		c.nodePools = [
+			{ ...newPool('general', 'g.4x16', 1), autoscaling: true, minReplicas: 1, maxReplicas: 4 },
+			newPool('memory', 'm.4x32', 2)
+		];
+		s.workloads = [newWorkload(c.id, {
+			replicas: 1, maxReplicas: 2, cpuRequest: 0.1, memRequestGiB: 0.5,
+			cpuLimit: 100, memLimitGiB: 200, storageGiB: 3, antiAffinity: 'none'
+		})];
+		return s;
+	}
+
+	it('checks full mixed-flavour capacity at pool maximum even when peak pods fit on current nodes', () => {
+		const s = mixedPools();
+		s.clusters[0].quota = { cpu: 16, memGiB: 100 };
+		const r = analyzeScenario(s);
+		const c = r.clusters[0];
+		expect(c.totals.nodes).toBe(3);
+		expect(c.peak.nodes).toHaveLength(3);
+		expect(c.quotaTotals.nodes).toBe(6);
+		expect(c.quota[0]).toMatchObject({ used: 24, quota: 16, pct: 1.5 });
+		expect(c.quota[1]).toMatchObject({ used: 128, quota: 100, pct: 1.28 });
+		expect(c.quota[2].used).toBe(6);
+		expect(r.findings.filter((f) => f.category === 'quota' && f.severity === 'critical')).toHaveLength(2);
+	});
+
+	it('includes recommended peak spare nodes rather than just raw requirements or simulated nodes', () => {
+		const s = scenario();
+		s.assumptions = { ...s.assumptions, allowedTypeIds: ['g.4x16'], sizeFor: 'baseline', spareNodes: 2 };
+		s.clusters[0].quota.auto = true;
+		s.workloads = [newWorkload(s.clusters[0].id, {
+			replicas: 1, maxReplicas: 8, cpuRequest: 0.5, memRequestGiB: 1, antiAffinity: 'required'
+		})];
+		const c = analyzeScenario(s).clusters[0];
+		expect(c.pools[0].nodesPeak).toBe(8);
+		expect(c.quotaTotals.nodes).toBe(10);
+		expect(c.quota[0].quota).toBe(40);
+		expect(c.quota[1].quota).toBe(160);
+	});
+
+	it('calculates independent scenario and cluster caps and checks effective cluster allocations', () => {
+		const s = mixedPools();
+		const second = newCluster('second');
+		second.poolMode = 'manual';
+		second.nodePools = [newPool('workers', 'g.8x32', 2)];
+		second.quota = { auto: true, cpu: 999, memGiB: 999 };
+		s.clusters.push(second);
+		s.clusters[0].quota = { auto: true, cpu: 1, memGiB: 1 };
+		s.scenarioQuota = { cpu: 39, memGiB: 191 };
+		const r = analyzeScenario(s);
+		expect(r.quota[0]).toMatchObject({ quota: 39, used: 40 });
+		expect(r.quota[1]).toMatchObject({ quota: 191, used: 192 });
+		expect(r.quotaTotals.nodes).toBe(8);
+		expect(r.findings.some((f) => f.id === 'quota-overcommit')).toBe(true);
+		expect(r.findings.some((f) => f.id === 'quota-scenario-cpu' && f.severity === 'critical')).toBe(true);
+		s.scenarioQuota.auto = true;
+		const auto = analyzeScenario(s);
+		expect(auto.quota[0].quota).toBe(40);
+		expect(auto.quota[1].quota).toBe(192);
+		expect(auto.findings.some((f) => f.id === 'quota-overcommit')).toBe(false);
+		expect(auto.findings.some((f) => f.category === 'quota')).toBe(false);
+		// A calculated scenario cap does not erase larger explicit cluster allocations.
+		s.clusters[0].quota = { cpu: 100 };
+		expect(analyzeScenario(s).findings.some((f) => f.id === 'quota-overcommit')).toBe(true);
+	});
+
+	it('recalculates automatic caps as pools change and restores manual caps without changing scenario inputs', () => {
+		const s = mixedPools();
+		s.clusters[0].quota = { cpu: 7, memGiB: 9, storageGiB: 1, auto: true };
+		s.scenarioQuota = { cpu: 5, memGiB: 6, auto: true };
+		const saved = JSON.stringify(s);
+		for (const mode of ['guided', 'standard', 'expert'] as const) {
+			expect(analyzeScenario(s, mode).clusters[0].quota[0].quota).toBe(24);
+			expect(JSON.stringify(s)).toBe(saved);
+		}
+		s.clusters[0].nodePools[0].maxReplicas = 5;
+		expect(analyzeScenario(s).quota[0].quota).toBe(28);
+		s.clusters[0].quota.auto = false;
+		s.scenarioQuota.auto = false;
+		const manual = analyzeScenario(s);
+		expect(manual.clusters[0].quota.map((q) => q.quota)).toEqual([7, 9, 1]);
+		expect(manual.quota.slice(0, 2).map((q) => q.quota)).toEqual([5, 6]);
+	});
+
+	it('does not cap recommendations or hide scheduling shortages to satisfy quota', () => {
+		const s = mixedPools();
+		const before = analyzeScenario(s);
+		s.clusters[0].quota = { cpu: 0, memGiB: 0, auto: false };
+		const limited = analyzeScenario(s);
+		expect(limited.clusters[0].pools).toEqual(before.clusters[0].pools);
+		expect(limited.clusters[0].sim).toEqual(before.clusters[0].sim);
+		expect(limited.clusters[0].peak).toEqual(before.clusters[0].peak);
+		expect(limited.clusters[0].quota[0].pct).toBe(Infinity);
+		expect(limited.findings.some((f) => f.category === 'quota' && f.severity === 'critical')).toBe(true);
+		s.clusters[0].quota.auto = true;
+		s.workloads[0].maxReplicas = 100;
+		s.workloads[0].antiAffinity = 'required';
+		const under = analyzeScenario(s);
+		expect(under.clusters[0].peak.unscheduled.length).toBeGreaterThan(0);
+		expect(under.findings.some((f) => f.id === `peak-${s.clusters[0].id}`)).toBe(true);
+		expect(under.clusters[0].quota[0].quota).toBe(24);
+		s.clusters[0].poolMode = 'auto';
+		const recommended = analyzeScenario(s);
+		s.clusters[0].quota = { cpu: 1, memGiB: 1 };
+		expect(analyzeScenario(s).clusters[0].pools).toEqual(recommended.clusters[0].pools);
+	});
+
+	it('checks peak PVCs separately, including pool-targeted DaemonSets at maximum', () => {
+		const s = mixedPools();
+		const c = s.clusters[0];
+		c.quota = { auto: true, storageGiB: 10 };
+		s.workloads.push(
+			newWorkload(c.id, { kind: 'DaemonSet', pool: '', storageGiB: 2 }),
+			newWorkload(c.id, { kind: 'DaemonSet', pool: 'memory', storageGiB: 5 }),
+			newWorkload(c.id, { enabled: false, maxReplicas: 100, storageGiB: 100 })
+		);
+		const r = analyzeScenario(s);
+		expect(r.clusters[0].quota[2]).toMatchObject({ quota: 10, used: 6 + 6 * 2 + 2 * 5 });
+		expect(r.findings.some((f) => f.id === `quota-${c.id}-storage` && f.severity === 'critical')).toBe(true);
+	});
+
+	it('treats missing caps as unset and zero as a real cap, including an empty footprint', () => {
+		const s = mixedPools();
+		expect(analyzeScenario(s).quota.every((q) => q.quota === null)).toBe(true);
+		s.clusters[0].nodePools = [];
+		s.workloads = [];
+		s.clusters[0].quota = { auto: true };
+		s.scenarioQuota = { auto: true };
+		const empty = analyzeScenario(s);
+		expect(empty.quota.slice(0, 2).map((q) => [q.quota, q.used, q.pct])).toEqual([[0, 0, 0], [0, 0, 0]]);
+	});
+
+	it('persists optional automation and manual values in v1 JSON, accepts older files, and rejects invalid quota settings', () => {
+		const s = mixedPools();
+		expect(scenarioError(s)).toBeNull();
+		s.clusters[0].quota = { auto: true, cpu: 2, memGiB: 3, storageGiB: 4 };
+		s.scenarioQuota = { auto: true, cpu: 7 };
+		const back: Scenario = JSON.parse(JSON.stringify(s));
+		expect(scenarioError(back)).toBeNull();
+		expect(back.clusters[0].quota).toEqual(s.clusters[0].quota);
+		expect(analyzeScenario(back).quota).toEqual(analyzeScenario(s).quota);
+		const invalidAuto = { ...s, scenarioQuota: { auto: 'true' } };
+		expect(scenarioError(invalidAuto)).toContain('true or false');
+		const invalidCap = { ...s, scenarioQuota: { cpu: -1 } };
+		expect(scenarioError(invalidCap)).toContain('non-negative');
+		s.scenarioQuota.cpu = -1;
+		expect(() => analyzeScenario(s)).toThrow('non-negative');
 	});
 });
 

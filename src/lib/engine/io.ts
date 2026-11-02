@@ -178,6 +178,18 @@ export function scenarioError(x: unknown): string | null {
 	const s = x as Scenario;
 	if (!s || s.version !== 1 || !Array.isArray(s.clusters) || !Array.isArray(s.workloads) || !Array.isArray(s.catalog) || !s.assumptions)
 		return 'Not a Calctainer scenario (version 1).';
+	for (const [scope, quota] of [
+		['Scenario', s.scenarioQuota],
+		...s.clusters.map((c) => [c?.name ?? '?', c?.quota] as const)
+	] as const) {
+		if (!quota || typeof quota !== 'object' || Array.isArray(quota)) return `${scope}: missing quota object.`;
+		if (quota.auto !== undefined && typeof quota.auto !== 'boolean') return `${scope}: automatic quota calculation must be true or false.`;
+		for (const resource of ['cpu', 'memGiB', 'storageGiB'] as const) {
+			const value = quota[resource];
+			if (value != null && (typeof value !== 'number' || !Number.isFinite(value) || value < 0))
+				return `${scope}: ${resource} quota must be a non-negative number or empty.`;
+		}
+	}
 	for (const w of s.workloads) {
 		if (w?.namespace == null) continue;
 		const err = typeof w.namespace === 'string' ? namespaceError(w.namespace) : 'Namespace must be text.';

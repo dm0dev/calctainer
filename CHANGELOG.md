@@ -2,6 +2,8 @@
 
 ## 2026-11-02
 
+- Added automatic CPU/RAM quota toggles per hosted cluster and for the scenario, retaining manual caps when disabled. Infrastructure quota checks now use full worker-VM capacity across every pool at its peak/maximum count, including recommended spare nodes, rather than baseline capacity or workload requests/limits. Older scenarios remain loadable, but their legacy quota-basis selection is ignored. Zero quotas are enforced. The quota view explains pool contributions and the difference between calculated requirements and granted allowances; PVC storage stays separate and checks peak demand, not VM disks.
+
 - Moved the HTML entry page into `src` and updated Vite and accessibility CI paths; development URLs, public assets, and the `dist` deployment output stay unchanged.
 - Adopted the MIT License for Calctainer, declared it in package metadata, and documented the license in the README.
 - Changed the primary palette to Petrol (`#007194`), Ziegelstein (`#b22222`), and PANTONE 7405 (`#FFCC00`); red is now reserved for semantic error states. Resource-series shades remain legible across light and dark themes.

@@ -205,11 +205,15 @@ function totalsFor(sim: SimResult, pools: PoolResult[], workloads: Workload[], a
 	return t;
 }
 
-export function quotaLines(q: Quota, t: Totals, basis: Assumptions['quotaBasis']): QuotaLine[] {
+export function quotaLines(q: Quota, t: Totals): QuotaLine[] {
+	if (q.auto !== undefined && typeof q.auto !== 'boolean') throw new Error('Automatic quota calculation must be true or false.');
 	const line = (resource: QuotaLine['resource'], quota: number | null | undefined, nodes: number, requests: number, limits: number): QuotaLine => {
-		const used = basis === 'nodes' ? nodes : basis === 'requests' ? requests : limits;
-		const qq = quota != null && Number.isFinite(quota) && quota > 0 ? quota : null;
-		return { resource, quota: qq, nodes, requests, limits, used, pct: qq ? used / qq : null };
+		if (quota != null && (!Number.isFinite(quota) || quota < 0))
+			throw new Error(`${resource} quota must be a non-negative number or empty.`);
+		const used = nodes;
+		const cap = q.auto && resource !== 'storage' ? used : quota;
+		const qq = cap != null && Number.isFinite(cap) && cap >= 0 ? cap : null;
+		return { resource, quota: qq, nodes, requests, limits, used, pct: qq == null ? null : qq === 0 ? (used > 0 ? Infinity : 0) : used / qq };
 	};
 	return [
 		line('cpu', q.cpu, t.vcpu, t.reqCpu, t.limCpu),
@@ -218,24 +222,28 @@ export function quotaLines(q: Quota, t: Totals, basis: Assumptions['quotaBasis']
 	];
 }
 
-function quotaFindings(lines: QuotaLine[], clusterId: string | null, scope: string, basis: string): Finding[] {
+function quotaFindings(lines: QuotaLine[], clusterId: string | null, scope: string, automatic = false): Finding[] {
 	const out: Finding[] = [];
 	const unit = { cpu: 'vCPU', mem: 'GiB memory', storage: 'GiB storage' } as const;
 	for (const l of lines) {
 		if (l.pct == null || l.quota == null) continue;
 		const id = `quota-${clusterId ?? 'scenario'}-${l.resource}`;
 		const u = unit[l.resource];
-		const basisLabel = l.resource === 'storage' ? 'PVC requests' : basis === 'nodes' ? 'node capacity' : basis;
+		if (automatic && l.resource !== 'storage') continue;
+		const basisLabel = l.resource === 'storage' ? 'peak PVC requests' : 'peak worker-VM capacity';
+		const consumption = l.quota === 0 ? 'no allowance' : pct(l.pct);
 		if (l.pct > 1)
 			out.push({
 				id,
 				severity: 'critical',
 				category: 'quota',
 				clusterId,
-				title: `${scope}: ${u} quota exceeded (${pct(l.pct)})`,
+				title: `${scope}: ${u} quota exceeded (${consumption})`,
 				detail: `${r1(l.used)} ${u} (${basisLabel}) against a quota of ${l.quota}.`,
 				plain: `You are planning to use more than your allowance of ${u}.`,
-				action: 'Raise the quota, reduce replicas/requests or move workloads to another hosted cluster.'
+				action: l.resource === 'storage'
+					? 'Raise the storage quota or reduce peak PVC requests; VM disks are not modelled.'
+					: 'Raise the quota or revise the worker pool composition and autoscaling maximum; check workload fit again.'
 			});
 		else if (l.pct > 0.85)
 			out.push({
@@ -510,12 +518,19 @@ export function analyzeCluster(c: HostedCluster, allWorkloads: Workload[], a: As
 	const frag = fragmentation(sim, active);
 	const rem = removable(pools, sim, active, a);
 	const totals = totalsFor(sim, pools, active, a);
-	const quota = quotaLines(c.quota, totals, a.quotaBasis);
+	// Account for every VM at the pool maximum, including spare nodes, not just nodes the peak scheduler used.
+	// Unplaced peak pods still contribute demand/PVCs, so insufficient capacity never hides storage demand.
+	const quotaTotals = totalsFor({
+		nodes: buildNodes(specs.map((p) => ({ ...p, nodes: p.maxNodes })), a, active, key),
+		unscheduled: peakPods(active)
+	}, pools, active, a);
+	quotaTotals.cost = pools.reduce((sum, p) => sum + p.maxNodes * instanceCost(p.type, a), 0);
+	const quota = quotaLines(c.quota, quotaTotals);
 	const findings = [
 		...clusterFindings(c, active, pools, sim, peak, failures, headroom, frag, rem, a),
-		...quotaFindings(quota, c.id, c.name, a.quotaBasis)
+		...quotaFindings(quota, c.id, c.name, c.quota.auto)
 	];
-	return { clusterId: c.id, name: c.name, pools, sim, peak, failures, totals, quota, headroom, fragmentation: frag, findings, removableNodes: rem };
+	return { clusterId: c.id, name: c.name, pools, sim, peak, failures, totals, quotaTotals, quota, headroom, fragmentation: frag, findings, removableNodes: rem };
 }
 
 const footprint = (nodes: number, type: InstanceType | undefined, a: Assumptions): Footprint =>
@@ -570,17 +585,21 @@ export function analyzeScenario(s: Scenario, mode: Mode = 'expert'): ScenarioRes
 		},
 		{ nodes: 0, vcpu: 0, memGiB: 0, allocCpu: 0, allocMem: 0, reqCpu: 0, reqMem: 0, limCpu: 0, limMem: 0, storageGiB: 0, pods: 0, cost: 0 }
 	);
-	const quota = quotaLines(s.scenarioQuota, totals, s.assumptions.quotaBasis);
-	const clusterQuotaSum = s.clusters.reduce(
-		(acc, c) => ({ cpu: acc.cpu + (c.quota.cpu ?? 0), mem: acc.mem + (c.quota.memGiB ?? 0), st: acc.st + (c.quota.storageGiB ?? 0) }),
+	const quotaTotals = clusters.reduce<Totals>((t, c) => {
+		for (const k of Object.keys(t) as (keyof Totals)[]) t[k] += c.quotaTotals[k];
+		return t;
+	}, { nodes: 0, vcpu: 0, memGiB: 0, allocCpu: 0, allocMem: 0, reqCpu: 0, reqMem: 0, limCpu: 0, limMem: 0, storageGiB: 0, pods: 0, cost: 0 });
+	const quota = quotaLines(s.scenarioQuota, quotaTotals);
+	const clusterQuotaSum = clusters.reduce(
+		(acc, c) => ({ cpu: acc.cpu + (c.quota[0].quota ?? 0), mem: acc.mem + (c.quota[1].quota ?? 0), st: acc.st + (c.quota[2].quota ?? 0) }),
 		{ cpu: 0, mem: 0, st: 0 }
 	);
-	const findings: Finding[] = [...quotaFindings(quota, null, 'Scenario', s.assumptions.quotaBasis)];
-	const sq = s.scenarioQuota;
+	const findings: Finding[] = [...quotaFindings(quota, null, 'Scenario', s.scenarioQuota.auto)];
+	const sq = { cpu: quota[0].quota, memGiB: quota[1].quota, storageGiB: quota[2].quota };
 	const over = [
-		sq.cpu && clusterQuotaSum.cpu > sq.cpu ? `CPU ${clusterQuotaSum.cpu}/${sq.cpu}` : '',
-		sq.memGiB && clusterQuotaSum.mem > sq.memGiB ? `memory ${clusterQuotaSum.mem}/${sq.memGiB} GiB` : '',
-		sq.storageGiB && clusterQuotaSum.st > sq.storageGiB ? `storage ${clusterQuotaSum.st}/${sq.storageGiB} GiB` : ''
+		sq.cpu != null && clusterQuotaSum.cpu > sq.cpu ? `CPU ${clusterQuotaSum.cpu}/${sq.cpu}` : '',
+		sq.memGiB != null && clusterQuotaSum.mem > sq.memGiB ? `memory ${clusterQuotaSum.mem}/${sq.memGiB} GiB` : '',
+		sq.storageGiB != null && clusterQuotaSum.st > sq.storageGiB ? `storage ${clusterQuotaSum.st}/${sq.storageGiB} GiB` : ''
 	].filter(Boolean);
 	if (over.length)
 		findings.push({
@@ -596,7 +615,7 @@ export function analyzeScenario(s: Scenario, mode: Mode = 'expert'): ScenarioRes
 		findings.push({ id: 'empty', severity: 'info', category: 'hygiene', clusterId: null, title: 'No workloads yet', detail: 'Add workloads to get a sizing recommendation.' });
 	const order = { critical: 0, warning: 1, info: 2, ok: 3 } as const;
 	findings.sort((x, y) => order[x.severity] - order[y.severity]);
-	return { clusters, totals, quota, findings, savings: savings(s, clusters) };
+	return { clusters, totals, quotaTotals, quota, findings, savings: savings(s, clusters) };
 }
 
 export { DEFAULT_POOL };

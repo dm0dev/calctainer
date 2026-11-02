@@ -45,7 +45,7 @@ export const GLOSSARY: Record<string, { term: string; text: string }> = {
 	},
 	quota: {
 		term: 'Quota',
-		text: 'An allowance of CPU, memory and storage granted to a hosted cluster or to the whole scenario. The planner compares it against node capacity, requests or limits.'
+		text: 'An infrastructure allowance checked against full worker-VM CPU and RAM at peak pool size, not workload requests or limits. Automatic quotas estimate the required allowance, not a granted budget. PVC storage is checked separately; VM disks are not modelled.'
 	},
 	pvc: {
 		term: 'External storage (PVC)',

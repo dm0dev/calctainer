@@ -84,6 +84,8 @@ Keep provisioned node capacity distinct from workload requests/limits and quota 
 - Generic, AWS, and Azure instance-type catalogues, with editable planning assumptions and estimated instance costs.
 - Approximate deterministic placement using spread or bin-pack, including platform overhead, fragmentation, scale headroom, and a node-failure check.
 - Findings for quota, sizing, resource balance, resilience, and other planning concerns.
+- Infrastructure CPU/RAM quotas check the full worker-VM footprint at peak: sum of each pool's maximum VM count times its instance capacity (fixed pools use their configured count). Recommendations include peak workload demand and spare nodes; custom autoscaling pools reserve their configured maximum. This quota footprint is not the current order, workload requests/limits, or the number of nodes the peak scheduler happened to need. Quota shortages are reported without reducing the plan to fit.
+- Each cluster and the scenario total have an **Automatically calculate CPU/RAM quota** toggle in every mode. Calculated caps follow the peak VM footprint as inputs change; they estimate the allowance to request, not a granted budget. Turning the toggle off restores saved manual caps. Storage remains a separate, manually set PVC quota checked against peak replicas and DaemonSets at pool maximum; VM disks are not modelled. A calculated quota does not resolve scheduling shortages.
 - A configurable classic-versus-HCP estimate. HCP results cover hosted-cluster workers only; management-cluster and hosted-control-plane costs are excluded.
 
 The simulation is a planning approximation, not the Kubernetes scheduler. It does not guarantee that a real cluster will schedule every workload.
@@ -93,6 +95,7 @@ Memory limits are not memory usage or reservable RAM: requests determine placeme
 ## Import, export, and local data
 
 - Scenario import/export: complete scenario files in JSON.
+- Quota automation is saved in schema-version-1 JSON as optional `quota.auto` / `scenarioQuota.auto`; missing means manual. Older files remain loadable, but the legacy `assumptions.quotaBasis` field is no longer used: infrastructure quota checks always use peak VM capacity rather than baseline capacity or workload requests/limits. Empty caps mean unset; zero means no allowance.
 - Workload import/export: spreadsheet-compatible CSV with a `namespace` column (missing → `default`; rows with invalid namespaces are skipped and reported); import supports append or replace per cluster and accepts comma- or semicolon-separated files.
 - The YAML shown for a workload is an illustrative Kubernetes manifest preview, not scenario serialization or a deployment guarantee.
 - Working scenarios and UI preferences are saved in browser `localStorage`. Data is not sent to a service; export a scenario file to move or back it up.

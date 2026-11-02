@@ -28,6 +28,8 @@ export interface InstanceType {
 }
 
 export interface Quota {
+	/** Derive CPU/memory caps from the peak worker-VM footprint; retain manual caps below. */
+	auto?: boolean;
 	cpu?: number | null;
 	memGiB?: number | null;
 	storageGiB?: number | null;
@@ -138,6 +140,7 @@ export interface Assumptions {
 	pricePerVcpu: number;
 	pricePerGiB: number;
 	currency: string;
+	/** Legacy setting retained for file compatibility; quotas always check worker-VM capacity. */
 	quotaBasis: QuotaBasis;
 }
 
@@ -335,6 +338,8 @@ export interface ClusterResult {
 	peak: SimResult;
 	failures: FailureTest[];
 	totals: Totals;
+	/** Full pool capacity at autoscaling maximum (fixed count for non-autoscaling pools). */
+	quotaTotals: Totals;
 	quota: QuotaLine[];
 	headroom: WorkloadHeadroom[];
 	fragmentation: Fragmentation;
@@ -362,6 +367,7 @@ export interface SavingsResult {
 export interface ScenarioResult {
 	clusters: ClusterResult[];
 	totals: Totals;
+	quotaTotals: Totals;
 	quota: QuotaLine[];
 	findings: Finding[];
 	savings: SavingsResult;

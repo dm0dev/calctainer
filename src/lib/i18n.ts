@@ -2,6 +2,25 @@ export const LANGUAGES = ['en', 'de'] as const;
 export type Language = (typeof LANGUAGES)[number];
 
 const GERMAN: Record<string, string> = {
+	'Automatically calculate CPU/RAM quota': 'CPU/RAM-Quota automatisch berechnen',
+	'Calculated': 'Berechnet',
+	'Exceeded': 'Überschritten',
+	'Peak worker-VM capacity': 'Worker-VM-Kapazität bei Spitzenlast',
+	'Storage quota (PVC)': 'Speicherplatzkontingent (PVC)',
+	'Calculated quota is a planning requirement, not a granted infrastructure allowance. Manual values are retained when automatic calculation is turned off.':
+		'Die berechnete Quota ist ein Planungsbedarf, kein bewilligtes Infrastrukturkontingent. Manuelle Werte bleiben beim Ausschalten der automatischen Berechnung erhalten.',
+	'Check peak worker-VM capacity against infrastructure quotas, per hosted cluster and for the whole scenario. Management clusters and hosted control planes are excluded.':
+		'Prüfen Sie die Worker-VM-Kapazität bei Spitzenlast gegen Infrastrukturquotas, je Hosted Cluster und für das gesamte Szenario. Management-Cluster und Hosted Control Planes sind ausgeschlossen.',
+	'CPU/RAM = sum of each pool’s VM count × full instance capacity. Recommended pools use peak demand plus spare nodes; custom autoscaling pools use their maximum, fixed pools their configured count. This is potential peak capacity, not the current order or workload requests/limits.':
+		'CPU/RAM = Summe aus VM-Anzahl × voller Instanzkapazität je Pool. Empfohlene Pools nutzen Spitzenbedarf plus Reserveknoten; eigene Autoscaling-Pools ihr Maximum, feste Pools ihre konfigurierte Anzahl. Dies ist die mögliche Spitzenkapazität, nicht die aktuelle Bestellung oder Workload-Requests/-Limits.',
+	'Storage is separate: peak PVC requests, including DaemonSets at the pool maximum. VM disks are not modelled. Automatic calculation only sets CPU/RAM quotas; scheduling shortages remain visible in Findings.':
+		'Speicherplatz wird separat geprüft: PVC-Requests bei Spitzenlast, einschließlich DaemonSets am Poolmaximum. VM-Festplatten werden nicht modelliert. Die automatische Berechnung setzt nur CPU/RAM-Quotas; Platzierungsengpässe bleiben unter Ergebnisse sichtbar.',
+	'Raise the quota or revise the worker pool composition and autoscaling maximum; check workload fit again.':
+		'Erhöhen Sie die Quota oder überarbeiten Sie die Worker-Pool-Zusammensetzung und das Autoscaling-Maximum; prüfen Sie anschließend erneut, ob die Workloads passen.',
+	'Raise the storage quota or reduce peak PVC requests; VM disks are not modelled.':
+		'Erhöhen Sie das Speicherplatzkontingent oder reduzieren Sie die PVC-Requests bei Spitzenlast; VM-Festplatten werden nicht modelliert.',
+	'An infrastructure allowance checked against full worker-VM CPU and RAM at peak pool size, not workload requests or limits. Automatic quotas estimate the required allowance, not a granted budget. PVC storage is checked separately; VM disks are not modelled.':
+		'Ein Infrastrukturkontingent, das gegen volle Worker-VM-CPU und RAM bei maximaler Poolgröße geprüft wird, nicht gegen Workload-Requests oder -Limits. Automatische Quotas schätzen das benötigte Kontingent, kein bewilligtes Budget. PVC-Speicherplatz wird separat geprüft; VM-Festplatten werden nicht modelliert.',
 	'Scenario name': 'Szenarioname',
 	'Experience level': 'Erfahrungsstufe',
 	'Guided': 'Geführt',
