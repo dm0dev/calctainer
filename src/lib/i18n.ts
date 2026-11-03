@@ -2,6 +2,68 @@ export const LANGUAGES = ['en', 'de'] as const;
 export type Language = (typeof LANGUAGES)[number];
 
 const GERMAN: Record<string, string> = {
+	'expected an object.': 'Ein Objekt wird erwartet.',
+	'expected a list.': 'Eine Liste wird erwartet.',
+	'expected text.': 'Text wird erwartet.',
+	'expected true or false.': 'true oder false wird erwartet.',
+	'unsupported kind or version.': 'Nicht unterstützter Dateityp oder nicht unterstützte Version.',
+	'unsupported internal version.': 'Nicht unterstützte interne Version.',
+	'select at least one dataset.': 'Wählen Sie mindestens einen Datensatz aus.',
+	'duplicate instance IDs.': 'Doppelte Instanz-IDs.',
+	'at least one instance type is required.': 'Mindestens ein Instanztyp ist erforderlich.',
+	'minimum exceeds maximum.': 'Das Minimum überschreitet das Maximum.',
+	'selected count must be within its autoscaling range.': 'Die gewählte Anzahl muss innerhalb des Autoscaling-Bereichs liegen.',
+	'peak replicas must not be below baseline.': 'Die Spitzenanzahl der Replicas darf nicht unter der Basisanzahl liegen.',
+	'definitions must match the cluster reference scope.': 'Die Definitionen müssen dem Clusterbereich der Datei entsprechen.',
+	'must contain one entry for every cluster in the file scope.': 'Für jeden Cluster im Dateibereich muss ein Eintrag enthalten sein.',
+	'replacement requires every dataset.': 'Zum Ersetzen sind alle Datensätze erforderlich.',
+	'Local files': 'Lokale Dateien',
+	'Save scenario datasets and assumptions separately. Export calculated quotas to Excel for other tools. Everything stays in your browser.':
+		'Szenariodatensätze und Annahmen getrennt speichern. Berechnete Quotas für andere Werkzeuge nach Excel exportieren. Alles bleibt in Ihrem Browser.',
+	'Quota report (Excel)': 'Quota-Bericht (Excel)',
+	'Calculated requirements, overall allowance, consumed and free quota — for the scenario and every hosted cluster.':
+		'Berechneter Bedarf, Gesamtkontingent, verbrauchte und freie Quota — für das Szenario und jeden Hosted Cluster.',
+	'Includes pool contributions, workloads, assumptions and findings. Export only; not a scenario backup. Consumption is planned peak capacity, not measured usage.':
+		'Enthält Pool-Beiträge, Workloads, Annahmen und Ergebnisse. Nur Export; keine Szenariosicherung. Verbrauch ist geplante Spitzenkapazität, keine gemessene Nutzung.',
+	'Generating report…': 'Bericht wird erstellt…',
+	'Export Excel report': 'Excel-Bericht exportieren',
+	'Choose datasets to save. Assumptions are never included; save the separate assumptions file for a reproducible backup.':
+		'Datensätze zum Speichern auswählen. Annahmen sind nie enthalten; speichern Sie für eine reproduzierbare Sicherung auch die separate Annahmendatei.',
+	'Export datasets': 'Datensätze exportieren',
+	'Import datasets': 'Datensätze importieren',
+	'Quotas': 'Quotas',
+	'Classic comparison': 'Classic-Vergleich',
+	'Without hosted clusters, importing these datasets requires matching cluster IDs in the target scenario.':
+		'Ohne Hosted Cluster erfordert der Import dieser Datensätze übereinstimmende Cluster-IDs im Zielszenario.',
+	'Export selected': 'Auswahl exportieren',
+	'Choose scenario file': 'Szenariodatei auswählen',
+	'Legacy scenario: embedded assumptions will not be applied. Use the Assumptions importer to extract them explicitly.':
+		'Älteres Szenario: Enthaltene Annahmen werden nicht angewendet. Über den Annahmenimport können sie ausdrücklich übernommen werden.',
+	'Replace entire scenario (all datasets required)': 'Gesamtes Szenario ersetzen (alle Datensätze erforderlich)',
+	'Update replaces selected data only within the file’s cluster scope and retains unrelated clusters. Empty selected lists clear that scope. Cluster IDs must match; names are not used for matching.':
+		'Die Aktualisierung ersetzt ausgewählte Daten nur im Clusterbereich der Datei und behält andere Cluster bei. Leere ausgewählte Listen leeren diesen Bereich. Cluster-IDs müssen übereinstimmen; Namen werden nicht zum Abgleich verwendet.',
+	'Preview: {added} clusters added, {removed} removed, {retained} unrelated clusters retained; {workloads} workloads after import.':
+		'Vorschau: {added} Cluster hinzugefügt, {removed} entfernt, {retained} andere Cluster beibehalten; {workloads} Workloads nach dem Import.',
+	'New clusters use automatic pool recommendations and unset quotas for datasets not provided.':
+		'Neue Cluster verwenden automatische Pool-Empfehlungen und ungesetzte Quotas für nicht bereitgestellte Datensätze.',
+	'Apply selected datasets': 'Ausgewählte Datensätze anwenden',
+	'Assumptions (JSON)': 'Annahmen (JSON)',
+	'Sizing policy, overhead, quota headroom and pricing settings. Import replaces these settings only; referenced instance types must exist in the active catalogue. Legacy scenario files are also accepted here.':
+		'Dimensionierung, Overhead, Quota-Reserve und Preiseinstellungen. Der Import ersetzt nur diese Einstellungen; referenzierte Instanztypen müssen im aktiven Katalog vorhanden sein. Ältere Szenariodateien werden hier ebenfalls akzeptiert.',
+	'Export assumptions': 'Annahmen exportieren',
+	'Import assumptions': 'Annahmen importieren',
+	'File exported.': 'Datei exportiert.',
+	'Quota report exported.': 'Quota-Bericht exportiert.',
+	'Replace active assumptions? Workloads, pools and quota settings will be retained.':
+		'Aktive Annahmen ersetzen? Workloads, Pools und Quota-Einstellungen bleiben erhalten.',
+	'Assumptions imported. Scenario datasets were retained.': 'Annahmen importiert. Szenariodatensätze wurden beibehalten.',
+	'Replace all scenario datasets? Clusters absent from the file will be removed. Active assumptions will be retained.':
+		'Alle Szenariodatensätze ersetzen? Nicht in der Datei enthaltene Cluster werden entfernt. Aktive Annahmen bleiben erhalten.',
+	'Replace selected datasets in the file scope? Unselected data and active assumptions will be retained.':
+		'Ausgewählte Datensätze im Dateibereich ersetzen? Nicht ausgewählte Daten und aktive Annahmen bleiben erhalten.',
+	'Selected datasets imported. Active assumptions were retained.': 'Ausgewählte Datensätze importiert. Aktive Annahmen wurden beibehalten.',
+	'Full control: pool targeting, anti-affinity, manual node pools, scheduler strategy, catalogue and manifest preview.':
+		'Volle Kontrolle: Pool-Zuweisung, Anti-Affinität, manuelle Node-Pools, Scheduler-Strategie, Katalog und Manifestvorschau.',
 	'Skip to main content': 'Zum Hauptinhalt springen',
 	'does not fit': 'passt nicht',
 	'month': 'Monat',
@@ -565,6 +627,15 @@ const GERMAN: Record<string, string> = {
 }
 
 const DYNAMIC_GERMAN: [RegExp, (match: RegExpMatchArray) => string][] = [
+	[/^expected a (whole )?number between (.+) and (.+)\.$/, (m) => `Eine ${m[1] ? 'ganze ' : ''}Zahl zwischen ${m[2]} und ${m[3]} wird erwartet.`],
+	[/^expected (.+)\.$/, (m) => `Erwartet: ${m[1]}.`],
+	[/^duplicate (.+) "(.+)"\.$/, (m) => `Doppelter Wert für ${m[1]}: „${m[2]}“.`],
+	[/^unknown dataset "(.+)"\.$/, (m) => `Unbekannter Datensatz „${m[1]}“.`],
+	[/^missing reference for "(.+)"\.$/, (m) => `Fehlende Referenz für „${m[1]}“.`],
+	[/^unknown cluster reference "(.+)"\.$/, (m) => `Unbekannte Clusterreferenz „${m[1]}“.`],
+	[/^"(.+)" is not present in the file\.$/, (m) => `„${m[1]}“ ist in der Datei nicht enthalten.`],
+	[/^"(.+)" is missing\. Select hosted clusters or import into the original scenario\.$/, (m) => `„${m[1]}“ fehlt. Wählen Sie Hosted Cluster aus oder importieren Sie in das ursprüngliche Szenario.`],
+	[/^instance type "(.+)" is missing\. Import a compatible catalogue or change the retained references first\.$/, (m) => `Instanztyp „${m[1]}“ fehlt. Importieren Sie einen kompatiblen Katalog oder ändern Sie zuerst die beibehaltenen Referenzen.`],
 	[/^(\d+) pod\(s\) cannot be scheduled$/, (m) => `${m[1]} Pod(s) können nicht eingeplant werden`],
 	[/^Pending pods from: (.+)\.(?: No node pool named (.+) exists\.)?$/, (m) => `Ausstehende Pods von: ${m[1]}.${m[2] ? ` Es gibt keinen Node-Pool namens ${m[2]}.` : ''}`],
 	[/^Pool "(.+)" is (.+) allocated \(target (.+)\)$/, (m) => `Pool „${m[1]}“ ist zu ${m[2]} belegt (Ziel ${m[3]})`],
@@ -630,7 +701,8 @@ const DYNAMIC_GERMAN: [RegExp, (match: RegExpMatchArray) => string][] = [
 	[/^Row (\d+): missing name, skipped$/, (m) => `Zeile ${m[1]}: Name fehlt, übersprungen`],
 	[/^Row (\d+): invalid namespace "(.+)" \((.+)\), skipped$/, (m) => `Zeile ${m[1]}: ungültiger Namespace „${m[2]}“ (${translate(m[3], 'de')}), übersprungen`],
 	[/^Missing "name" column\. Expected columns: (.+)$/, (m) => `Spalte „name“ fehlt. Erwartete Spalten: ${m[1]}`],
-	[/^“(.+)”: (.+)$/, (m) => `„${m[1]}“: ${m[2]}`]
+	[/^“(.+)”: (.+)$/, (m) => `„${m[1]}“: ${m[2]}`],
+	[/^([^:]+): (.+)$/, (m) => `${m[1]}: ${translate(m[2], 'de')}`]
 ];
 
 function translateGenerated(source: string): string | undefined {

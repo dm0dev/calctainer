@@ -117,6 +117,13 @@ export function loadScenarioObject(s: Scenario) {
 	app.ui.clusterId = s.clusters[0]?.id ?? null;
 }
 
+/** Commit an already validated import without resetting unrelated UI preferences. */
+export function applyImportedScenario(s: Scenario) {
+	const activeId = app.ui.clusterId;
+	app.scenario = s;
+	app.ui.clusterId = s.clusters.some((c) => c.id === activeId) ? activeId : s.clusters[0]?.id ?? null;
+}
+
 export function resetToSample() {
 	loadScenarioObject(sampleScenario());
 }

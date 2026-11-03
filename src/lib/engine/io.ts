@@ -164,7 +164,7 @@ export function csvToWorkloads(text: string, s: Scenario): CsvImportResult {
 	return { workloads: out, newClusters, errors };
 }
 
-export function download(filename: string, content: string, mime = 'text/plain') {
+export function download(filename: string, content: BlobPart, mime = 'text/plain') {
 	const blob = new Blob([content], { type: mime });
 	const url = URL.createObjectURL(blob);
 	const a = document.createElement('a');

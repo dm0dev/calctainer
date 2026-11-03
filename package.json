@@ -29,6 +29,9 @@
     },
     "packageManager": "pnpm@12.16.1",
     "type": "module",
+    "dependencies": {
+        "exceljs": "^4.4.0"
+    },
     "devDependencies": {
         "@fontsource-variable/red-hat-display": "^5.3.0",
         "@fontsource-variable/red-hat-mono": "^5.3.0",

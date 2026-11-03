@@ -34,4 +34,14 @@ describe('language preference', () => {
 			'Jede Instanz reserviert 0.5 CPU-Kern(e) (Request) und darf kurzzeitig bis zu 2 (Limit) nutzen.'
 		);
 	});
+
+	it('translates portable import controls and actionable validation reasons', () => {
+		expect(translate('Export Excel report', 'de')).toBe('Excel-Bericht exportieren');
+		expect(translate('Scenario quota: expected a number between 0 and Infinity.', 'de')).toBe(
+			'Scenario quota: Eine Zahl zwischen 0 und Infinity wird erwartet.'
+		);
+		expect(translate('Clusters: "hc-1" is missing. Select hosted clusters or import into the original scenario.', 'de')).toContain(
+			'Wählen Sie Hosted Cluster aus'
+		);
+	});
 });

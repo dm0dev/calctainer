@@ -25,7 +25,7 @@
 			v: 'expert',
 			l: translate('Expert', app.ui.language),
 			who: translate('Migrating from classic OpenShift', app.ui.language),
-			d: translate('Full control: pool targeting, anti-affinity, manual node pools, scheduler strategy, catalogue, CSV and YAML.', app.ui.language),
+			d: translate('Full control: pool targeting, anti-affinity, manual node pools, scheduler strategy, catalogue and manifest preview.', app.ui.language),
 			icon: Wrench
 		}
 	]);

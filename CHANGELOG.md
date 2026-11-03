@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-03
+
+- Split import/export into selectable scenario datasets and independent assumptions JSON. New scenario files exclude assumptions; imports preview scope, preserve unselected data and active settings, validate references and calculate before applying. Existing complete scenario files remain readable, with explicit extraction of their assumptions. Full replacement requires all datasets and confirmation.
+- Replaced workload CSV controls with a styled, export-only Excel quota report: calculated requirements, effective allowances, consumed/free/exceeded quota and utilization for the scenario and every cluster, with pool contributions, workload inventory, assumptions/catalogue and findings. Reports distinguish current worker capacity from the maximum quota footprint, retain zero/unset cap semantics, and block invalid inputs instead of exporting stale results. Workbook generation stays local and loads only when requested.
+
 ## 2026-11-02
 
 - Rebased all success shades on `#217563` for consistent green status text, badges, and shapes, preserving the independently edited memory colors.
